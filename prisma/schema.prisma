@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AnimalClassification {
+  id          String   @id @default(cuid())
+  animalType  String   // "cattle" or "buffalo"
+  imageUrl    String
+  imagePath   String
+  
+  // Physical traits measurements
+  bodyLength      Float?
+  heightAtWithers Float?
+  chestWidth      Float?
+  rumpAngle       Float?
+  bodyCondition   Float?
+  
+  // Classification scores
+  overallScore    Float
+  breedScore      Float?
+  conformationScore Float?
+  
+  // Additional metadata
+  breed          String?
+  age            Int?
+  weight         Float?
+  gender         String?
+  
+  // Location and farm data
+  farmId         String?
+  farmName       String?
+  location       String?
+  
+  // Relation to Farm
+  farm           Farm?    @relation(fields: [farmId], references: [id])
+  
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Analysis metadata
+  analysisNotes  String?
+  confidence     Float?
+  
+  @@map("animal_classifications")
+}
+
+model Farm {
+  id          String   @id @default(cuid())
+  name        String
+  location    String?
+  contactInfo String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  classifications AnimalClassification[]
+  
+  @@map("farms")
+}
