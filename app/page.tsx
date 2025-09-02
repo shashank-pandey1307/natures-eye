@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, Camera, FileText, BarChart3 } from 'lucide-react';
+import { Upload, Camera, FileText, BarChart3, Sparkles, Zap, Target, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BackgroundParticles, FloatingOrbs, EnergyWaves } from '@/components/ui/particles';
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -21,20 +23,17 @@ export default function Home() {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // Create temporary preview URL
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleFarmDataChange = (field: keyof typeof farmData, value: string) => {
     setFarmData({ ...farmData, [field]: value });
-    // Clear messages when user starts typing
     if (message) {
       setMessage(null);
     }
   };
 
-  // Cleanup object URLs when component unmounts
   useEffect(() => {
     return () => {
       if (imagePreview) {
@@ -46,7 +45,6 @@ export default function Home() {
   const handleAnalyze = async () => {
     if (!selectedFile) return;
 
-    // Validate farm data
     if (farmData.farmId && !farmData.farmName) {
       setMessage('Please enter a farm name when providing a farm ID');
       return;
@@ -54,9 +52,8 @@ export default function Home() {
 
     setIsAnalyzing(true);
     setResult(null);
-    setMessage(null); // Clear previous messages
+    setMessage(null);
     
-    // Clear previous file selection
     if (selectedFile) {
       setSelectedFile(null);
     }
@@ -86,7 +83,6 @@ export default function Home() {
       setMessage('Failed to analyze image. Please try again.');
     } finally {
       setIsAnalyzing(false);
-      // Clear image preview after analysis
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview);
         setImagePreview(null);
@@ -94,240 +90,369 @@ export default function Home() {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { scale: 0.9, opacity: 0 },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut" as const
+      }
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-primary mb-2">
-          Nature's Eye
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          AI-Powered Animal Classification System
-        </p>
-      </div>
+         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
+       {/* Animated Background Elements */}
+       <BackgroundParticles />
+       <FloatingOrbs />
+       <EnergyWaves />
 
-      {/* Message Display */}
-      {message && (
-        <div className={`p-4 rounded-lg mb-6 text-center border ${
-          message.includes('Error') || message.includes('Failed') || message.includes('Please enter')
-            ? 'bg-red-50 text-red-800 border-red-200'
-            : 'bg-green-50 text-green-800 border-green-200'
-        }`}>
-          {message}
-        </div>
-      )}
+      <div className="relative z-10 container mx-auto px-4 py-8">
+        <motion.div 
+          className="text-center mb-12"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div
+            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl mb-6 shadow-2xl"
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Sparkles className="w-10 h-10 text-white" />
+          </motion.div>
+          
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
+            Nature's Eye
+          </h1>
+          
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+            Advanced AI-powered livestock classification system for precise cattle and buffalo analysis
+          </p>
+        </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Upload Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Upload Animal Image
-            </CardTitle>
-            <CardDescription>
-              Upload an image of cattle or buffalo for AI-powered classification
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Farm Information */}
-            <div className="space-y-3">
-              <h3 className="font-medium">Farm Information (Optional)</h3>
-              <input
-                type="text"
-                placeholder="Farm ID (optional)"
-                className="w-full p-2 border rounded-md"
-                value={farmData.farmId}
-                onChange={(e) => handleFarmDataChange('farmId', e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Farm Name (required if Farm ID provided)"
-                className="w-full p-2 border rounded-md"
-                value={farmData.farmName}
-                onChange={(e) => handleFarmDataChange('farmName', e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Location (optional)"
-                className="w-full p-2 border rounded-md"
-                value={farmData.location}
-                onChange={(e) => handleFarmDataChange('location', e.target.value)}
-              />
-            </div>
-
-            {/* File Upload */}
-            <div className="space-y-3">
-              <h3 className="font-medium">Image Upload</h3>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Camera className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, WebP up to 10MB
-                  </p>
-                </label>
-              </div>
-                             {selectedFile && (
-                 <div className="space-y-2">
-                   <p className="text-sm text-green-600">
-                     Selected: {selectedFile.name}
-                   </p>
-                   {imagePreview && (
-                     <div className="relative">
-                       <img 
-                         src={imagePreview} 
-                         alt="Preview" 
-                         className="w-full h-32 object-cover rounded-lg border"
-                       />
-                       <p className="text-xs text-gray-500 mt-1 text-center">
-                         Preview (will be deleted after analysis)
-                       </p>
-                     </div>
-                   )}
-                 </div>
-               )}
-            </div>
-
-                         <div className="flex gap-2">
-               <Button
-                 onClick={handleAnalyze}
-                 disabled={!selectedFile || isAnalyzing}
-                 className="flex-1"
-               >
-                 {isAnalyzing ? 'Analyzing...' : 'Analyze Image'}
-               </Button>
-               {selectedFile && !isAnalyzing && (
-                 <Button
-                   onClick={() => {
-                     setSelectedFile(null);
-                     if (imagePreview) {
-                       URL.revokeObjectURL(imagePreview);
-                       setImagePreview(null);
-                     }
-                   }}
-                   variant="outline"
-                   className="px-4"
-                 >
-                   Clear
-                 </Button>
-               )}
-             </div>
-          </CardContent>
-        </Card>
-
-        {/* Results Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Analysis Results
-            </CardTitle>
-            <CardDescription>
-              AI-generated classification and measurements
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isAnalyzing ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                <p>Analyzing image with AI...</p>
-              </div>
-            ) : result ? (
-              <div className="space-y-4">
-                {/* Animal Type */}
-                <div className="bg-primary/10 p-4 rounded-lg">
-                  <h3 className="font-medium text-primary mb-2">Animal Type</h3>
-                  <p className="text-lg capitalize">{result.analysis.animalType}</p>
+        <motion.div 
+          className="max-w-4xl mx-auto"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+                                           <Card className="bg-gradient-to-br from-blue-950/95 via-indigo-950/90 to-blue-950/95 backdrop-blur-xl border-blue-500/50 shadow-2xl shadow-blue-600/20">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-3xl font-bold text-blue-100 mb-2">
+                Upload & Analyze
+              </CardTitle>
+              <CardDescription className="text-blue-200 text-lg">
+                Get instant AI-powered livestock classification
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              {/* Image Upload Section */}
+              <motion.div 
+                className="space-y-4"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                                         className="block w-full h-64 border-2 border-dashed border-blue-400/60 rounded-2xl bg-gradient-to-br from-blue-900/50 via-indigo-900/40 to-blue-900/50 hover:from-blue-800/60 hover:via-indigo-800/50 hover:to-blue-800/60 transition-all duration-300 cursor-pointer group"
+                  >
+                    <motion.div 
+                      className="flex flex-col items-center justify-center h-full text-center p-6"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      {imagePreview ? (
+                        <div className="relative w-full h-full">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-full object-cover rounded-xl"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl flex items-end justify-center pb-4">
+                            <span className="text-white text-sm font-medium">Click to change image</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <motion.div
+                            className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                            whileHover={{ rotate: 5 }}
+                          >
+                            <Upload className="w-10 h-10 text-white" />
+                          </motion.div>
+                          <p className="text-blue-200 text-lg font-medium mb-2">
+                            Drop your image here or click to browse
+                          </p>
+                          <p className="text-blue-300 text-sm">
+                            Supports JPEG, PNG, WebP (Max 10MB)
+                          </p>
+                        </>
+                      )}
+                    </motion.div>
+                  </label>
                 </div>
+              </motion.div>
 
-                {/* Measurements */}
-                <div>
-                  <h3 className="font-medium mb-2">Physical Measurements</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>Body Length: {result.analysis.measurements.bodyLength} cm</div>
-                    <div>Height at Withers: {result.analysis.measurements.heightAtWithers} cm</div>
-                    <div>Chest Width: {result.analysis.measurements.chestWidth} cm</div>
-                    <div>Rump Angle: {result.analysis.measurements.rumpAngle}°</div>
-                    <div>Body Condition: {result.analysis.measurements.bodyCondition}/9</div>
+              {/* Farm Information Section */}
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.1 }}
+              >
+                                                                   <div className="space-y-2">
+                    <label className="text-blue-200 text-sm font-medium">Farm ID</label>
+                    <input
+                      type="text"
+                      value={farmData.farmId}
+                      onChange={(e) => handleFarmDataChange('farmId', e.target.value)}
+                      placeholder="Enter farm ID"
+                      className="w-full px-4 py-3 bg-blue-900/60 border border-blue-500/50 rounded-xl text-blue-100 placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    />
                   </div>
-                </div>
-
-                {/* Scores */}
-                <div>
-                  <h3 className="font-medium mb-2">Classification Scores</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Overall Score:</span>
-                      <span className="font-medium">{result.analysis.scores.overallScore}/100</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Breed Score:</span>
-                      <span className="font-medium">{result.analysis.scores.breedScore}/100</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Conformation Score:</span>
-                      <span className="font-medium">{result.analysis.scores.conformationScore}/100</span>
-                    </div>
+                
+                                                                    <div className="space-y-2">
+                    <label className="text-blue-200 text-sm font-medium">Farm Name</label>
+                    <input
+                      type="text"
+                      value={farmData.farmName}
+                      onChange={(e) => handleFarmDataChange('farmName', e.target.value)}
+                      placeholder="Enter farm name"
+                      className="w-full px-4 py-3 bg-blue-900/60 border border-blue-500/50 rounded-xl text-blue-100 placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    />
                   </div>
-                </div>
-
-                {/* Metadata */}
-                {result.analysis.metadata && (
-                  <div>
-                    <h3 className="font-medium mb-2">Additional Information</h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      {result.analysis.metadata.breed && (
-                        <div>Breed: {result.analysis.metadata.breed}</div>
-                      )}
-                      {result.analysis.metadata.age && (
-                        <div>Age: {result.analysis.metadata.age} years</div>
-                      )}
-                      {result.analysis.metadata.weight && (
-                        <div>Weight: {result.analysis.metadata.weight} kg</div>
-                      )}
-                      {result.analysis.metadata.gender && (
-                        <div>Gender: {result.analysis.metadata.gender}</div>
-                      )}
-                    </div>
+                
+                                                                    <div className="space-y-2">
+                    <label className="text-blue-200 text-sm font-medium">Location</label>
+                    <input
+                      type="text"
+                      value={farmData.location}
+                      onChange={(e) => handleFarmDataChange('location', e.target.value)}
+                      placeholder="Enter location"
+                      className="w-full px-4 py-3 bg-blue-900/60 border border-blue-500/50 rounded-xl text-blue-100 placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    />
                   </div>
-                )}
+              </motion.div>
 
-                {/* Confidence */}
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Confidence Level:</span>
-                    <span className="text-green-600 font-bold">
-                      {(result.analysis.confidence * 100).toFixed(1)}%
+              {/* Analyze Button */}
+              <motion.div 
+                className="text-center pt-4"
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.2 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    onClick={handleAnalyze}
+                    disabled={!imagePreview || isAnalyzing}
+                    className="w-full md:w-auto px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold text-lg rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                  {isAnalyzing ? (
+                    <motion.div
+                      className="flex items-center space-x-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      <motion.div
+                        className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      />
+                      <span>Analyzing...</span>
+                    </motion.div>
+                  ) : (
+                    <span className="flex items-center space-x-2">
+                      <Target className="w-5 h-5" />
+                      <span>Analyze Image</span>
                     </span>
-                  </div>
-                </div>
+                  )}
+                </Button>
+                </motion.div>
+              </motion.div>
 
-                {/* Analysis Notes */}
-                {result.analysis.analysisNotes && (
-                  <div>
-                    <h3 className="font-medium mb-2">Analysis Notes</h3>
-                    <p className="text-sm text-gray-600">{result.analysis.analysisNotes}</p>
-                  </div>
+              {/* Message Display */}
+              <AnimatePresence>
+                {message && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className={`p-4 rounded-xl text-center ${
+                      message.includes('Error') || message.includes('Failed')
+                        ? 'bg-red-500/20 border border-red-500/30 text-red-200'
+                        : 'bg-green-500/20 border border-green-500/30 text-green-200'
+                    }`}
+                  >
+                    {message}
+                  </motion.div>
                 )}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Upload an image to see analysis results</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
+              </AnimatePresence>
+
+                             {/* Results Display */}
+               <AnimatePresence>
+                 {result && (
+                   <motion.div
+                     initial={{ opacity: 0, scale: 0.9 }}
+                     animate={{ opacity: 1, scale: 1 }}
+                     exit={{ opacity: 0, scale: 0.9 }}
+                                          className="mt-8 p-6 bg-gradient-to-br from-slate-800/60 via-blue-900/50 to-slate-800/60 rounded-2xl border border-blue-500/40 shadow-lg"
+                   >
+                     <h3 className="text-2xl font-bold text-blue-100 mb-4 text-center">
+                       Analysis Results
+                     </h3>
+                     
+
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                             <div className="space-y-4">
+                         <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                           <h4 className="text-blue-200 font-semibold mb-2">Animal Details</h4>
+                           <div className="space-y-2 text-blue-100">
+                             <p><span className="text-blue-300">Type:</span> {result.classification.animalType}</p>
+                             <p><span className="text-blue-300">Breed:</span> {result.classification.breed || 'Unknown'}</p>
+                             <p><span className="text-blue-300">Gender:</span> {result.classification.gender || 'Unknown'}</p>
+                             <p><span className="text-blue-300">Age:</span> {result.classification.age || 'Unknown'} years</p>
+                           </div>
+                         </div>
+                        
+                                                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                           <h4 className="text-blue-200 font-semibold mb-2">Measurements</h4>
+                           <div className="space-y-2 text-blue-100">
+                             <p><span className="text-blue-300">Body Length:</span> {result.classification.bodyLength} cm</p>
+                             <p><span className="text-blue-300">Height:</span> {result.classification.heightAtWithers} cm</p>
+                             <p><span className="text-blue-300">Chest Width:</span> {result.classification.chestWidth} cm</p>
+                             <p><span className="text-blue-300">Rump Angle:</span> {result.classification.rumpAngle}°</p>
+                           </div>
+                         </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                                                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                           <h4 className="text-blue-200 font-semibold mb-2">Quality Scores</h4>
+                          <div className="space-y-3">
+                            <div>
+                              <div className="flex justify-between text-blue-100 mb-1">
+                                <span>Overall Score</span>
+                                <span className="font-semibold">{result.classification.overallScore}/100</span>
+                              </div>
+                              <div className="w-full bg-blue-900/50 rounded-full h-2">
+                                <motion.div
+                                  className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${result.classification.overallScore}%` }}
+                                  transition={{ duration: 1, delay: 0.5 }}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <div className="flex justify-between text-blue-100 mb-1">
+                                <span>Breed Score</span>
+                                <span className="font-semibold">{result.classification.breedScore}/100</span>
+                              </div>
+                              <div className="w-full bg-blue-900/50 rounded-full h-2">
+                                <motion.div
+                                  className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full"
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${result.classification.breedScore}%` }}
+                                  transition={{ duration: 1, delay: 0.7 }}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <div className="flex justify-between text-blue-100 mb-1">
+                                <span>Conformation</span>
+                                <span className="font-semibold">{result.classification.conformationScore}/100</span>
+                              </div>
+                              <div className="w-full bg-blue-900/50 rounded-full h-2">
+                                <motion.div
+                                  className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full"
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${result.classification.conformationScore}%` }}
+                                  transition={{ duration: 1, delay: 0.9 }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                                                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                           <h4 className="text-blue-200 font-semibold mb-2">Confidence</h4>
+                          <div className="text-center">
+                            <motion.div
+                              className="text-3xl font-bold text-cyan-400 mb-2"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", delay: 1 }}
+                            >
+                              {(result.classification.confidence * 100).toFixed(1)}%
+                            </motion.div>
+                            <p className="text-blue-200 text-sm">AI Confidence Level</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                                         {result.classification.analysisNotes && (
+                       <div className="mt-6 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
+                         <h4 className="text-blue-200 font-semibold mb-2">Analysis Notes</h4>
+                         <p className="text-blue-100 text-sm leading-relaxed">
+                           {result.classification.analysisNotes}
+                         </p>
+                       </div>
+                     )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+                 </motion.div>
+       </div>
+       
+       {/* Empty container for scrolling space */}
+       <div className="h-32"></div>
+     </div>
+   );
+ }
