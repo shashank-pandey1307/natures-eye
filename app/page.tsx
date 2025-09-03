@@ -164,7 +164,7 @@ export default function Home() {
             <Leaf className="w-12 h-12 text-white" />
           </motion.div>
           
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-teal-600 via-cyan-500 to-emerald-600 bg-clip-text text-transparent mb-4 gentle-bounce">
+          <h1 className="text-6xl font-bold text-emerald-800 mb-4 gentle-bounce">
             Nature's Eye
           </h1>
           
