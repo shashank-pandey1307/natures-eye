@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, Camera, FileText, BarChart3, Sparkles, Zap, Target, TrendingUp } from 'lucide-react';
+import { Upload, Camera, FileText, BarChart3, Sparkles, Zap, Target, TrendingUp, Leaf } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BackgroundParticles, FloatingOrbs, EnergyWaves } from '@/components/ui/particles';
+import { BackgroundParticles, FloatingOrbs, EnergyWaves, FloatingClouds, FlyingBirds, Butterflies, SunRays, FloatingFlowers, FloatingLeaves, RainDrops, Fireflies, FloatingBubbles, EnhancedClouds, FloatingFeathers, FloatingSeeds } from '@/components/ui/particles';
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -126,11 +126,27 @@ export default function Home() {
   };
 
   return (
-         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
-       {/* Animated Background Elements */}
-       <BackgroundParticles />
-       <FloatingOrbs />
-       <EnergyWaves />
+         <div className="min-h-screen bg-gradient-to-br from-teal-500 via-cyan-400 to-emerald-500">
+               {/* Animated Background Elements */}
+        <BackgroundParticles />
+        <FloatingOrbs />
+        <EnergyWaves />
+        
+        {/* Beautiful Nature Animations */}
+        <FloatingClouds />
+        <FlyingBirds />
+        <Butterflies />
+        <SunRays />
+        <FloatingFlowers />
+        
+        {/* Enhanced Background Animations */}
+        <FloatingLeaves />
+        <RainDrops />
+        <Fireflies />
+        <FloatingBubbles />
+        <EnhancedClouds />
+        <FloatingFeathers />
+        <FloatingSeeds />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         <motion.div 
@@ -139,19 +155,20 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
+          {/* Enhanced Logo */}
           <motion.div
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl mb-6 shadow-2xl"
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            transition={{ type: "spring", stiffness: 300 }}
+            className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-teal-500 via-cyan-500 to-emerald-500 rounded-3xl mb-8 shadow-2xl shadow-teal-500/40 sparkle breathe"
+            whileHover={{ scale: 1.08, rotate: 8 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
           >
-            <Sparkles className="w-10 h-10 text-white" />
+            <Leaf className="w-12 h-12 text-white" />
           </motion.div>
           
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-teal-600 via-cyan-500 to-emerald-600 bg-clip-text text-transparent mb-4 gentle-bounce">
             Nature's Eye
           </h1>
           
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-white max-w-2xl mx-auto leading-relaxed">
             Advanced AI-powered livestock classification system for precise cattle and buffalo analysis
           </p>
         </motion.div>
@@ -162,12 +179,12 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
-                                           <Card className="bg-gradient-to-br from-blue-950/95 via-indigo-950/90 to-blue-950/95 backdrop-blur-xl border-blue-500/50 shadow-2xl shadow-blue-600/20">
+                                                                                       <Card className="bg-gradient-to-br from-white/90 via-cyan-100/85 to-emerald-100/90 backdrop-blur-xl border-teal-300/70 shadow-2xl shadow-teal-400/30 aurora">
             <CardHeader className="text-center pb-6">
-              <CardTitle className="text-3xl font-bold text-blue-100 mb-2">
+              <CardTitle className="text-3xl font-bold text-teal-800 mb-2">
                 Upload & Analyze
               </CardTitle>
-              <CardDescription className="text-blue-200 text-lg">
+              <CardDescription className="text-teal-600 text-lg">
                 Get instant AI-powered livestock classification
               </CardDescription>
             </CardHeader>
@@ -190,7 +207,7 @@ export default function Home() {
                   />
                   <label
                     htmlFor="image-upload"
-                                         className="block w-full h-64 border-2 border-dashed border-blue-400/60 rounded-2xl bg-gradient-to-br from-blue-900/50 via-indigo-900/40 to-blue-900/50 hover:from-blue-800/60 hover:via-indigo-800/50 hover:to-blue-800/60 transition-all duration-300 cursor-pointer group"
+                                         className="block w-full h-64 border-2 border-dashed border-teal-400/70 rounded-2xl bg-gradient-to-br from-cyan-200/60 via-teal-200/50 to-emerald-200/60 hover:from-cyan-300/70 hover:via-teal-300/60 hover:to-emerald-300/70 transition-all duration-300 cursor-pointer group"
                   >
                     <motion.div 
                       className="flex flex-col items-center justify-center h-full text-center p-6"
@@ -210,16 +227,16 @@ export default function Home() {
                         </div>
                       ) : (
                         <>
-                          <motion.div
-                            className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
-                            whileHover={{ rotate: 5 }}
-                          >
+                                                      <motion.div
+                              className="w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 sparkle"
+                              whileHover={{ rotate: 5 }}
+                            >
                             <Upload className="w-10 h-10 text-white" />
                           </motion.div>
-                          <p className="text-blue-200 text-lg font-medium mb-2">
+                          <p className="text-teal-700 text-lg font-medium mb-2">
                             Drop your image here or click to browse
                           </p>
-                          <p className="text-blue-300 text-sm">
+                          <p className="text-teal-600 text-sm">
                             Supports JPEG, PNG, WebP (Max 10MB)
                           </p>
                         </>
@@ -238,35 +255,35 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
               >
                                                                    <div className="space-y-2">
-                    <label className="text-blue-200 text-sm font-medium">Farm ID</label>
+                    <label className="text-teal-700 text-sm font-medium">Farm ID</label>
                     <input
                       type="text"
                       value={farmData.farmId}
                       onChange={(e) => handleFarmDataChange('farmId', e.target.value)}
                       placeholder="Enter farm ID"
-                      className="w-full px-4 py-3 bg-blue-900/60 border border-blue-500/50 rounded-xl text-blue-100 placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 bg-white/80 border border-teal-300/60 rounded-xl text-teal-800 placeholder-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300"
                     />
                   </div>
                 
                                                                     <div className="space-y-2">
-                    <label className="text-blue-200 text-sm font-medium">Farm Name</label>
+                    <label className="text-teal-700 text-sm font-medium">Farm Name</label>
                     <input
                       type="text"
                       value={farmData.farmName}
                       onChange={(e) => handleFarmDataChange('farmName', e.target.value)}
                       placeholder="Enter farm name"
-                      className="w-full px-4 py-3 bg-blue-900/60 border border-blue-500/50 rounded-xl text-blue-100 placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 bg-white/80 border border-teal-300/60 rounded-xl text-teal-800 placeholder-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300"
                     />
                   </div>
                 
                                                                     <div className="space-y-2">
-                    <label className="text-blue-200 text-sm font-medium">Location</label>
+                    <label className="text-teal-700 text-sm font-medium">Location</label>
                     <input
                       type="text"
                       value={farmData.location}
                       onChange={(e) => handleFarmDataChange('location', e.target.value)}
                       placeholder="Enter location"
-                      className="w-full px-4 py-3 bg-blue-900/60 border border-blue-500/50 rounded-xl text-blue-100 placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 bg-white/80 border border-teal-300/60 rounded-xl text-teal-800 placeholder-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300"
                     />
                   </div>
               </motion.div>
@@ -283,11 +300,11 @@ export default function Home() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Button
-                    onClick={handleAnalyze}
-                    disabled={!imagePreview || isAnalyzing}
-                    className="w-full md:w-auto px-12 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold text-lg rounded-2xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                                      <Button
+                      onClick={handleAnalyze}
+                      disabled={!imagePreview || isAnalyzing}
+                      className="w-full md:w-auto px-12 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold text-lg rounded-2xl shadow-2xl hover:shadow-teal-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed floating-dust"
+                    >
                   {isAnalyzing ? (
                     <motion.div
                       className="flex items-center space-x-2"
@@ -321,7 +338,7 @@ export default function Home() {
                     className={`p-4 rounded-xl text-center ${
                       message.includes('Error') || message.includes('Failed')
                         ? 'bg-red-500/20 border border-red-500/30 text-red-200'
-                        : 'bg-green-500/20 border border-green-500/30 text-green-200'
+                        : 'bg-emerald-600/90 border border-emerald-500 text-white font-semibold'
                     }`}
                   >
                     {message}
@@ -332,13 +349,13 @@ export default function Home() {
                              {/* Results Display */}
                <AnimatePresence>
                  {result && (
-                   <motion.div
-                     initial={{ opacity: 0, scale: 0.9 }}
-                     animate={{ opacity: 1, scale: 1 }}
-                     exit={{ opacity: 0, scale: 0.9 }}
-                                          className="mt-8 p-6 bg-gradient-to-br from-slate-800/60 via-blue-900/50 to-slate-800/60 rounded-2xl border border-blue-500/40 shadow-lg"
-                   >
-                     <h3 className="text-2xl font-bold text-blue-100 mb-4 text-center">
+                                       <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                                           className="mt-8 p-6 bg-gradient-to-br from-white/80 via-cyan-100/70 to-emerald-100/80 rounded-2xl border border-teal-300/50 shadow-lg firefly"
+                    >
+                     <h3 className="text-2xl font-bold text-teal-800 mb-4 text-center">
                        Analysis Results
                      </h3>
                      
@@ -346,39 +363,39 @@ export default function Home() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                              <div className="space-y-4">
-                         <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                           <h4 className="text-blue-200 font-semibold mb-2">Animal Details</h4>
-                           <div className="space-y-2 text-blue-100">
-                             <p><span className="text-blue-300">Type:</span> {result.classification.animalType}</p>
-                             <p><span className="text-blue-300">Breed:</span> {result.classification.breed || 'Unknown'}</p>
-                             <p><span className="text-blue-300">Gender:</span> {result.classification.gender || 'Unknown'}</p>
-                             <p><span className="text-blue-300">Age:</span> {result.classification.age || 'Unknown'} years</p>
+                         <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
+                           <h4 className="text-teal-700 font-semibold mb-2">Animal Details</h4>
+                           <div className="space-y-2 text-teal-800">
+                             <p><span className="text-teal-600">Type:</span> {result.classification.animalType}</p>
+                             <p><span className="text-teal-600">Breed:</span> {result.classification.breed || 'Unknown'}</p>
+                             <p><span className="text-teal-600">Gender:</span> {result.classification.gender || 'Unknown'}</p>
+                             <p><span className="text-teal-600">Age:</span> {result.classification.age || 'Unknown'} years</p>
                            </div>
                          </div>
                         
-                                                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                           <h4 className="text-blue-200 font-semibold mb-2">Measurements</h4>
-                           <div className="space-y-2 text-blue-100">
-                             <p><span className="text-blue-300">Body Length:</span> {result.classification.bodyLength} cm</p>
-                             <p><span className="text-blue-300">Height:</span> {result.classification.heightAtWithers} cm</p>
-                             <p><span className="text-blue-300">Chest Width:</span> {result.classification.chestWidth} cm</p>
-                             <p><span className="text-blue-300">Rump Angle:</span> {result.classification.rumpAngle}°</p>
+                                                 <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
+                           <h4 className="text-teal-700 font-semibold mb-2">Measurements</h4>
+                           <div className="space-y-2 text-teal-800">
+                             <p><span className="text-teal-600">Body Length:</span> {result.classification.bodyLength} cm</p>
+                             <p><span className="text-cyan-600">Height:</span> {result.classification.heightAtWithers} cm</p>
+                             <p><span className="text-cyan-600">Chest Width:</span> {result.classification.chestWidth} cm</p>
+                             <p><span className="text-cyan-600">Rump Angle:</span> {result.classification.rumpAngle}°</p>
                            </div>
                          </div>
                       </div>
                       
                       <div className="space-y-4">
-                                                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                           <h4 className="text-blue-200 font-semibold mb-2">Quality Scores</h4>
+                                                 <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
+                           <h4 className="text-teal-700 font-semibold mb-2">Quality Scores</h4>
                           <div className="space-y-3">
                             <div>
-                              <div className="flex justify-between text-blue-100 mb-1">
+                              <div className="flex justify-between text-teal-800 mb-1">
                                 <span>Overall Score</span>
                                 <span className="font-semibold">{result.classification.overallScore}/100</span>
                               </div>
-                              <div className="w-full bg-blue-900/50 rounded-full h-2">
+                              <div className="w-full bg-teal-200/60 rounded-full h-2">
                                 <motion.div
-                                  className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
+                                  className="bg-gradient-to-r from-teal-500 to-cyan-500 h-2 rounded-full"
                                   initial={{ width: 0 }}
                                   animate={{ width: `${result.classification.overallScore}%` }}
                                   transition={{ duration: 1, delay: 0.5 }}
@@ -387,13 +404,13 @@ export default function Home() {
                             </div>
                             
                             <div>
-                              <div className="flex justify-between text-blue-100 mb-1">
+                              <div className="flex justify-between text-teal-800 mb-1">
                                 <span>Breed Score</span>
                                 <span className="font-semibold">{result.classification.breedScore}/100</span>
                               </div>
-                              <div className="w-full bg-blue-900/50 rounded-full h-2">
+                              <div className="w-full bg-teal-200/60 rounded-full h-2">
                                 <motion.div
-                                  className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full"
+                                  className="bg-gradient-to-r from-cyan-500 to-teal-500 h-2 rounded-full"
                                   initial={{ width: 0 }}
                                   animate={{ width: `${result.classification.breedScore}%` }}
                                   transition={{ duration: 1, delay: 0.7 }}
@@ -402,13 +419,13 @@ export default function Home() {
                             </div>
                             
                             <div>
-                              <div className="flex justify-between text-blue-100 mb-1">
+                              <div className="flex justify-between text-teal-800 mb-1">
                                 <span>Conformation</span>
-                                <span className="font-semibold">{result.classification.conformationScore}/100</span>
+                                <span className="font-semibold">{result.classification.overallScore}/100</span>
                               </div>
-                              <div className="w-full bg-blue-900/50 rounded-full h-2">
+                              <div className="w-full bg-teal-200/60 rounded-full h-2">
                                 <motion.div
-                                  className="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full"
+                                  className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full"
                                   initial={{ width: 0 }}
                                   animate={{ width: `${result.classification.conformationScore}%` }}
                                   transition={{ duration: 1, delay: 0.9 }}
@@ -418,27 +435,27 @@ export default function Home() {
                           </div>
                         </div>
                         
-                                                 <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                           <h4 className="text-blue-200 font-semibold mb-2">Confidence</h4>
+                                                 <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
+                           <h4 className="text-teal-700 font-semibold mb-2">Confidence</h4>
                           <div className="text-center">
                             <motion.div
-                              className="text-3xl font-bold text-cyan-400 mb-2"
+                              className="text-3xl font-bold text-teal-600 mb-2"
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               transition={{ type: "spring", delay: 1 }}
                             >
                               {(result.classification.confidence * 100).toFixed(1)}%
                             </motion.div>
-                            <p className="text-blue-200 text-sm">AI Confidence Level</p>
+                            <p className="text-teal-700 text-sm">AI Confidence Level</p>
                           </div>
                         </div>
                       </div>
                     </div>
                     
                                          {result.classification.analysisNotes && (
-                       <div className="mt-6 bg-slate-800/60 p-4 rounded-xl border border-slate-700/50">
-                         <h4 className="text-blue-200 font-semibold mb-2">Analysis Notes</h4>
-                         <p className="text-blue-100 text-sm leading-relaxed">
+                       <div className="mt-6 bg-white/70 p-4 rounded-xl border border-teal-200/60">
+                         <h4 className="text-teal-700 font-semibold mb-2">Analysis Notes</h4>
+                         <p className="text-teal-800 text-sm leading-relaxed">
                            {result.classification.analysisNotes}
                          </p>
                        </div>

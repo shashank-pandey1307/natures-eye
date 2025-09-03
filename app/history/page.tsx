@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { History, Eye, Trash2, Filter } from 'lucide-react';
+import { History, Eye, Trash2, Filter, Leaf, BarChart3, MapPin, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Classification {
   id: string;
@@ -86,155 +87,264 @@ export default function HistoryPage() {
     });
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading classifications...</p>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <motion.div
+              className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl mb-6 shadow-lg"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Leaf className="h-8 w-8 text-white" />
+            </motion.div>
+            <p className="text-emerald-100 text-lg">Loading classifications...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-primary mb-2 flex items-center justify-center gap-2">
-          <History className="h-8 w-8" />
-          Classification History
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          View and manage past animal classifications
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900">
+      <div className="container mx-auto px-4 py-12">
+        <motion.div 
+          className="text-center mb-12"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div
+            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-400 rounded-3xl mb-6 shadow-2xl shadow-emerald-500/30"
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <History className="h-10 w-10 text-white" />
+          </motion.div>
+          
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent mb-4">
+            Classification History
+          </h1>
+          
+          <p className="text-xl text-emerald-100 max-w-2xl mx-auto leading-relaxed">
+            View and manage past animal classifications with detailed insights
+          </p>
+        </motion.div>
 
-      {/* Filters */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Animal Type</label>
-              <select
-                className="w-full p-2 border rounded-md"
-                value={filter.animalType}
-                onChange={(e) => setFilter({ ...filter, animalType: e.target.value })}
-              >
-                <option value="">All Types</option>
-                <option value="cattle">Cattle</option>
-                <option value="buffalo">Buffalo</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Farm ID</label>
-              <input
-                type="text"
-                placeholder="Enter Farm ID"
-                className="w-full p-2 border rounded-md"
-                value={filter.farmId}
-                onChange={(e) => setFilter({ ...filter, farmId: e.target.value })}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Classifications List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {classifications.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <History className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500">No classifications found</p>
-          </div>
-        ) : (
-          classifications.map((classification) => (
-            <Card key={classification.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="capitalize">{classification.animalType}</CardTitle>
-                    <CardDescription>
-                      {formatDate(classification.createdAt)}
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(classification.imageUrl, '_blank')}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(classification.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+        {/* Enhanced Filters */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <Card className="mb-8 bg-gradient-to-br from-slate-800/90 via-emerald-900/80 to-slate-800/90 backdrop-blur-2xl border-emerald-500/30 shadow-2xl shadow-emerald-600/20 rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-900/50 via-teal-900/40 to-emerald-900/50">
+              <CardTitle className="flex items-center gap-3 text-emerald-100 text-2xl">
+                <Filter className="h-6 w-6" />
+                Filters
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-emerald-200 text-sm font-medium flex items-center gap-2">
+                    <Leaf size={16} />
+                    Animal Type
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 bg-emerald-900/60 border border-emerald-500/40 rounded-2xl text-emerald-100 focus:outline-none focus:ring-3 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
+                    value={filter.animalType}
+                    onChange={(e) => setFilter({ ...filter, animalType: e.target.value })}
+                  >
+                    <option value="">All Types</option>
+                    <option value="cattle">Cattle</option>
+                    <option value="buffalo">Buffalo</option>
+                  </select>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Image Preview */}
-                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={classification.imageUrl}
-                    alt={`${classification.animalType} classification`}
-                    className="w-full h-full object-cover"
+                <div className="space-y-3">
+                  <label className="text-emerald-200 text-sm font-medium flex items-center gap-2">
+                    <MapPin size={16} />
+                    Farm ID
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter Farm ID"
+                    className="w-full px-4 py-3 bg-emerald-900/60 border border-emerald-500/40 rounded-2xl text-emerald-100 placeholder-emerald-300 focus:outline-none focus:ring-3 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
+                    value={filter.farmId}
+                    onChange={(e) => setFilter({ ...filter, farmId: e.target.value })}
                   />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-                {/* Key Metrics */}
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="font-medium">Overall Score:</span>
-                    <span className="ml-1 text-primary font-bold">
-                      {classification.overallScore}/100
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-medium">Confidence:</span>
-                    <span className="ml-1 text-green-600 font-bold">
-                      {(classification.confidence * 100).toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
+        {/* Enhanced Classifications List */}
+        <motion.div 
+          className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {classifications.length === 0 ? (
+            <motion.div 
+              className="col-span-full text-center py-16"
+              variants={itemVariants}
+            >
+              <History className="h-20 w-20 mx-auto text-emerald-400/30 mb-6" />
+              <p className="text-emerald-200 text-lg">No classifications found</p>
+              <p className="text-emerald-300 text-sm mt-2">Start by analyzing your first image</p>
+            </motion.div>
+          ) : (
+            <AnimatePresence>
+              {classifications.map((classification, index) => (
+                <motion.div
+                  key={classification.id}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className="group"
+                >
+                  <Card className="bg-gradient-to-br from-slate-800/90 via-emerald-900/80 to-slate-800/90 backdrop-blur-2xl border-emerald-500/30 shadow-2xl shadow-emerald-600/20 rounded-3xl overflow-hidden hover:shadow-emerald-500/30 transition-all duration-500">
+                    <CardHeader className="bg-gradient-to-r from-emerald-900/50 via-teal-900/40 to-emerald-900/50 p-6">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="capitalize text-emerald-100 text-xl flex items-center gap-2">
+                            <Leaf className="h-5 w-5" />
+                            {classification.animalType}
+                          </CardTitle>
+                          <CardDescription className="text-emerald-200 flex items-center gap-2 mt-2">
+                            <Calendar className="h-4 w-4" />
+                            {formatDate(classification.createdAt)}
+                          </CardDescription>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(classification.imageUrl, '_blank')}
+                            className="border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/20 hover:border-emerald-400"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(classification.id)}
+                            className="border-red-500/40 text-red-200 hover:bg-red-500/20 hover:border-red-400"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="p-6 space-y-6">
+                      {/* Enhanced Image Preview */}
+                      <div className="aspect-video bg-emerald-900/40 rounded-2xl overflow-hidden border border-emerald-500/20 group-hover:border-emerald-400/40 transition-all duration-300">
+                        <img
+                          src={classification.imageUrl}
+                          alt={`${classification.animalType} classification`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
 
-                {/* Measurements */}
-                <div className="text-xs text-gray-600 space-y-1">
-                  <div>Body Length: {classification.bodyLength} cm</div>
-                  <div>Height: {classification.heightAtWithers} cm</div>
-                  <div>Chest Width: {classification.chestWidth} cm</div>
-                  <div>Body Condition: {classification.bodyCondition}/9</div>
-                </div>
+                      {/* Enhanced Key Metrics */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-500/20">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-emerald-300 mb-1">
+                              {classification.overallScore}
+                            </div>
+                            <div className="text-emerald-200 text-sm">Overall Score</div>
+                          </div>
+                        </div>
+                        <div className="bg-teal-900/40 p-4 rounded-2xl border border-teal-500/20">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-teal-300 mb-1">
+                              {(classification.confidence * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-teal-200 text-sm">Confidence</div>
+                          </div>
+                        </div>
+                      </div>
 
-                {/* Farm Info */}
-                {classification.farmName && (
-                  <div className="text-xs text-gray-500">
-                    <div>Farm: {classification.farmName}</div>
-                    {classification.location && <div>Location: {classification.location}</div>}
-                  </div>
-                )}
+                      {/* Enhanced Measurements */}
+                      <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/50">
+                        <h4 className="text-emerald-200 font-semibold mb-3 flex items-center gap-2">
+                          <BarChart3 size={18} />
+                          Measurements
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="text-emerald-100">
+                            <span className="text-emerald-300">Body Length:</span> {classification.bodyLength} cm
+                          </div>
+                          <div className="text-emerald-100">
+                            <span className="text-emerald-300">Height:</span> {classification.heightAtWithers} cm
+                          </div>
+                          <div className="text-emerald-100">
+                            <span className="text-emerald-300">Chest Width:</span> {classification.chestWidth} cm
+                          </div>
+                          <div className="text-emerald-100">
+                            <span className="text-emerald-300">Body Condition:</span> {classification.bodyCondition}/9
+                          </div>
+                        </div>
+                      </div>
 
-                {/* Additional Info */}
-                {(classification.breed || classification.age || classification.gender) && (
-                  <div className="text-xs text-gray-600">
-                    {classification.breed && <div>Breed: {classification.breed}</div>}
-                    {classification.age && <div>Age: {classification.age} years</div>}
-                    {classification.gender && <div>Gender: {classification.gender}</div>}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))
-        )}
+                      {/* Enhanced Farm Info */}
+                      {classification.farmName && (
+                        <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-500/20">
+                          <h4 className="text-emerald-200 font-semibold mb-2 flex items-center gap-2">
+                            <MapPin size={16} />
+                            Farm Information
+                          </h4>
+                          <div className="text-emerald-100 text-sm space-y-1">
+                            <div>Farm: {classification.farmName}</div>
+                            {classification.location && <div>Location: {classification.location}</div>}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Enhanced Additional Info */}
+                      {(classification.breed || classification.age || classification.gender) && (
+                        <div className="bg-teal-900/40 p-4 rounded-2xl border border-teal-500/20">
+                          <h4 className="text-teal-200 font-semibold mb-2">Additional Details</h4>
+                          <div className="text-teal-100 text-sm space-y-1">
+                            {classification.breed && <div>Breed: {classification.breed}</div>}
+                            {classification.age && <div>Age: {classification.age} years</div>}
+                            {classification.gender && <div>Gender: {classification.gender}</div>}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+        </motion.div>
       </div>
     </div>
   );

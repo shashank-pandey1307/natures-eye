@@ -65,21 +65,33 @@
   
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
   }
   
   ::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
-    border-radius: 4px;
+    background: rgba(6, 78, 59, 0.3);
+    border-radius: 6px;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #3b82f6, #06b6d4);
-    border-radius: 4px;
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+    border-radius: 6px;
+    border: 2px solid rgba(6, 78, 59, 0.3);
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #2563eb, #0891b2);
+    background: linear-gradient(135deg, #059669, #0d9488);
+  }
+  
+  /* Selection styling */
+  ::selection {
+    background: rgba(16, 185, 129, 0.3);
+    color: #ecfdf5;
+  }
+  
+  ::-moz-selection {
+    background: rgba(16, 185, 129, 0.3);
+    color: #ecfdf5;
   }
 }
 
@@ -89,14 +101,315 @@
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent;
   }
   
-  .electric-blue-gradient {
-    @apply bg-gradient-to-r from-blue-500 to-cyan-500;
+  .nature-gradient {
+    @apply bg-gradient-to-r from-emerald-500 to-teal-500;
   }
   
-  .electric-blue-gradient-hover {
-    @apply hover:from-blue-600 hover:to-cyan-600;
+  .nature-gradient-hover {
+    @apply hover:from-emerald-600 hover:to-teal-600;
   }
+  
+  .nature-card {
+    @apply bg-gradient-to-br from-slate-800/90 via-emerald-900/80 to-slate-800/90 backdrop-blur-2xl border-emerald-500/30 shadow-2xl shadow-emerald-600/20;
+  }
+  
+  .nature-input {
+    @apply w-full px-5 py-4 bg-emerald-900/60 border border-emerald-500/40 rounded-2xl text-emerald-100 placeholder-emerald-300 focus:outline-none focus:ring-3 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300 text-lg;
+  }
+  
+  .nature-button {
+    @apply px-16 py-5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-xl rounded-3xl shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 border-0;
+  }
+  
+  .floating-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(16, 185, 129, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  /* New beautiful animations */
+  .rainbow-border {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #54a0ff);
+    background-size: 400% 400%;
+    animation: rainbow-border 3s ease infinite;
+  }
+  
+  .sparkle {
+    position: relative;
+  }
+  
+  .sparkle::before,
+  .sparkle::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fbbf24;
+    border-radius: 50%;
+    animation: sparkle-animation 2s linear infinite;
+  }
+  
+  .sparkle::before {
+    top: -10px;
+    left: 20%;
+    animation-delay: 0s;
+  }
+  
+  .sparkle::after {
+    top: -15px;
+    right: 20%;
+    animation-delay: 1s;
+  }
+  
+  .breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+  
+  .gentle-bounce {
+    animation: gentle-bounce 3s ease-in-out infinite;
+  }
+  
+  .aurora {
+    background: linear-gradient(
+      45deg,
+      rgba(16, 185, 129, 0.1),
+      rgba(20, 184, 166, 0.1),
+      rgba(59, 130, 246, 0.1),
+      rgba(147, 51, 234, 0.1),
+      rgba(236, 72, 153, 0.1)
+    );
+    background-size: 400% 400%;
+    animation: aurora 8s ease infinite;
+  }
+  
+  .firefly {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .firefly::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fbbf24;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #fbbf24;
+    animation: firefly 4s linear infinite;
+  }
+  
+  .nature-pulse {
+    animation: nature-pulse 3s ease-in-out infinite;
+  }
+  
+  .floating-dust {
+    position: relative;
+  }
+  
+  .floating-dust::before {
+    content: '✨';
+    position: absolute;
+    font-size: 12px;
+    color: rgba(16, 185, 129, 0.6);
+    animation: floating-dust 6s linear infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* New animation keyframes */
+@keyframes rainbow-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes sparkle-animation {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes aurora {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes firefly {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+
+@keyframes nature-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes floating-dust {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Nature-themed focus styles */
+.nature-input:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+/* Enhanced button hover effects */
+.nature-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Enhanced card hover effects */
+.nature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 50px rgba(16, 185, 129, 0.2);
+}
+
+/* Hover effects for nature elements */
+.nature-card:hover .floating-dust::before {
+  animation-duration: 3s;
+}
+
+.nature-card:hover .sparkle::before,
+.nature-card:hover .sparkle::after {
+  animation-duration: 1s;
+}
+
+/* Special effects for buttons */
+.nature-button:hover {
+  background-size: 200% 200%;
+  animation: rainbow-border 1s ease infinite;
+}
+
+/* Enhanced focus states */
+.nature-input:focus {
+  animation: nature-pulse 0.6s ease-in-out;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.1) 25%,
+    rgba(16, 185, 129, 0.2) 50%,
+    rgba(16, 185, 129, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
