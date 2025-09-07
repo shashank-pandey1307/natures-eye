@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export interface AnimalClassificationResult {
-  animalType: 'cattle' | 'buffalo';
+  animalType: 'cattle' | 'buffalo' | 'Human';
   measurements: {
     bodyLength: number;
     heightAtWithers: number;
@@ -30,8 +30,11 @@ export async function analyzeAnimalImage(imageBase64: string): Promise<AnimalCla
   // Check if we should use mock mode (when API key is not set or for testing)
   if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
     console.log('Using mock mode - no valid API key found');
+    // Randomly return different types for testing
+    const mockTypes = ['cattle', 'buffalo', 'Human'] as const;
+    const randomType = mockTypes[Math.floor(Math.random() * mockTypes.length)];
     return {
-      animalType: 'cattle' as const,
+      animalType: randomType,
       measurements: {
         bodyLength: 180,
         heightAtWithers: 140,
@@ -64,12 +67,12 @@ export async function analyzeAnimalImage(imageBase64: string): Promise<AnimalCla
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const prompt = `
-      Analyze this image of a livestock animal (cattle or buffalo) and provide detailed measurements and classification scores.
+      Analyze this image and classify what you see. This could be a livestock animal (cattle or buffalo) or a human. Provide detailed measurements and classification scores.
       
       Please provide the following information in EXACT JSON format with these exact field names:
       
       {
-        "animalType": "cattle" or "buffalo",
+        "animalType": "cattle", "buffalo", or "Human",
         "measurements": {
           "bodyLength": number (length from shoulder to rump in cm),
           "heightAtWithers": number (height at the highest point of the back in cm),
@@ -120,7 +123,7 @@ export async function analyzeAnimalImage(imageBase64: string): Promise<AnimalCla
       
       // Validate the response structure with more flexibility
       if (!analysis.animalType) {
-        analysis.animalType = 'cattle'; // Default to cattle if not specified
+        analysis.animalType = 'Human'; // Default to Human if not specified
       }
       
       if (!analysis.measurements) {
@@ -132,7 +135,7 @@ export async function analyzeAnimalImage(imageBase64: string): Promise<AnimalCla
       }
       
              return {
-         animalType: analysis['Animal Type'] || analysis.animalType || 'cattle',
+         animalType: analysis['Animal Type'] || analysis.animalType || 'Human',
          measurements: {
            bodyLength: (analysis['Physical Measurements (in cm)']?.bodyLength || analysis.measurements?.bodyLength || 0),
            heightAtWithers: (analysis['Physical Measurements (in cm)']?.heightAtWithers || analysis.measurements?.heightAtWithers || 0),
@@ -174,7 +177,7 @@ export async function analyzeAnimalImage(imageBase64: string): Promise<AnimalCla
   // If all retries failed, return fallback response
   console.error('All retry attempts failed:', lastError);
   return {
-    animalType: 'cattle' as const,
+    animalType: 'Human' as const,
     measurements: {
       bodyLength: 0,
       heightAtWithers: 0,

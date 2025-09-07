@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Save to database without image storage
     const classification = await prisma.animalClassification.create({
       data: {
-        animalType: analysis.animalType || 'cattle',
+        animalType: analysis.animalType || 'Human',
         imageUrl: '', // No image URL since we don't store images
         imagePath: '', // No image path since we don't store images
         bodyLength: analysis.measurements?.bodyLength || 0,
