@@ -345,7 +345,7 @@ export default function LiveCameraPage() {
      const finalDetectionChance = Math.min(baseDetectionChance, 0.8);
      
      // Determine scene type based on calculated probability
-     let selectedScene;
+     let selectedScene: string;
      const randomValue = Math.random();
      
      if (randomValue < finalDetectionChance) {
