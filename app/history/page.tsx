@@ -3,8 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { History, Eye, Trash2, Filter, Leaf, BarChart3, MapPin, Calendar } from 'lucide-react';
+import { History, Eye, Trash2, Filter, Leaf, BarChart3, MapPin, Calendar, User, Camera, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/language-context';
+import { ProtectedRoute } from '@/components/protected-route';
+import { translateAnalysisNotes } from '@/lib/utils';
 
 interface Classification {
   id: string;
@@ -27,15 +31,33 @@ interface Classification {
   location?: string;
   confidence: number;
   analysisNotes?: string;
+  source: string; // 'upload' or 'live'
   createdAt: string;
 }
 
 export default function HistoryPage() {
+  const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [classifications, setClassifications] = useState<Classification[]>([]);
+  
+  // Helper function to translate classification results
+  const translateResult = (result: string) => {
+    switch (result.toLowerCase()) {
+      case 'cattle':
+        return t('results.cattle');
+      case 'buffalo':
+        return t('results.buffalo');
+      case 'human':
+        return t('results.human');
+      default:
+        return t('results.unknown');
+    }
+  };
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({
     animalType: '',
     farmId: '',
+    source: '', // Filter by source: 'upload' or 'live'
   });
 
   useEffect(() => {
@@ -43,16 +65,29 @@ export default function HistoryPage() {
   }, [filter]);
 
   const fetchClassifications = async () => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const params = new URLSearchParams();
       if (filter.animalType) params.append('animalType', filter.animalType);
       if (filter.farmId) params.append('farmId', filter.farmId);
+      if (filter.source) params.append('source', filter.source);
 
-      const response = await fetch(`/api/classifications?${params}`);
+      const response = await fetch(`/api/classifications?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
         setClassifications(data.data);
+      } else if (response.status === 401) {
+        // Handle unauthorized - redirect to login
+        window.location.href = '/login';
       }
     } catch (error) {
       console.error('Error fetching classifications:', error);
@@ -67,10 +102,16 @@ export default function HistoryPage() {
     try {
       const response = await fetch(`/api/classifications/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
 
       if (response.ok) {
         setClassifications(classifications.filter(c => c.id !== id));
+      } else if (response.status === 401) {
+        // Handle unauthorized - redirect to login
+        window.location.href = '/login';
       }
     } catch (error) {
       console.error('Error deleting classification:', error);
@@ -130,8 +171,9 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900">
-      <div className="container mx-auto px-4 py-12">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900">
+        <div className="container mx-auto px-4 py-12">
         <motion.div 
           className="text-center mb-12"
           variants={itemVariants}
@@ -147,12 +189,19 @@ export default function HistoryPage() {
           </motion.div>
           
           <h1 className="text-5xl font-bold bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-400 bg-clip-text text-transparent mb-4">
-            Classification History
+            {t('history.title')}
           </h1>
           
-          <p className="text-xl text-emerald-100 max-w-2xl mx-auto leading-relaxed">
-            View and manage past animal classifications with detailed insights
+          <p className="text-xl text-emerald-100 max-w-2xl mx-auto leading-relaxed mb-4">
+            {t('history.subtitle')}
           </p>
+          
+          {user && (
+            <div className="inline-flex items-center gap-2 bg-emerald-900/40 px-4 py-2 rounded-2xl border border-emerald-500/30">
+              <User className="h-4 w-4 text-emerald-300" />
+              <span className="text-emerald-200 text-sm">Welcome, {user.name}</span>
+            </div>
+          )}
         </motion.div>
 
         {/* Enhanced Filters */}
@@ -161,38 +210,53 @@ export default function HistoryPage() {
             <CardHeader className="bg-gradient-to-r from-emerald-900/50 via-teal-900/40 to-emerald-900/50">
               <CardTitle className="flex items-center gap-3 text-emerald-100 text-2xl">
                 <Filter className="h-6 w-6" />
-                Filters
+                {t('history.filters')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-3">
                   <label className="text-emerald-200 text-sm font-medium flex items-center gap-2">
                     <Leaf size={16} />
-                    Animal Type
+                    {t('history.animalType')}
                   </label>
                   <select
                     className="w-full px-4 py-3 bg-emerald-900/60 border border-emerald-500/40 rounded-2xl text-emerald-100 focus:outline-none focus:ring-3 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
                     value={filter.animalType}
                     onChange={(e) => setFilter({ ...filter, animalType: e.target.value })}
                   >
-                    <option value="">All Types</option>
-                    <option value="cattle">Cattle</option>
-                    <option value="buffalo">Buffalo</option>
+                    <option value="">{t('history.allTypes')}</option>
+                    <option value="cattle">{t('results.cattle')}</option>
+                    <option value="buffalo">{t('results.buffalo')}</option>
                   </select>
                 </div>
                 <div className="space-y-3">
                   <label className="text-emerald-200 text-sm font-medium flex items-center gap-2">
                     <MapPin size={16} />
-                    Farm ID
+                    {t('history.farmId')}
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter Farm ID"
+                    placeholder={t('upload.farmIdPlaceholder')}
                     className="w-full px-4 py-3 bg-emerald-900/60 border border-emerald-500/40 rounded-2xl text-emerald-100 placeholder-emerald-300 focus:outline-none focus:ring-3 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
                     value={filter.farmId}
                     onChange={(e) => setFilter({ ...filter, farmId: e.target.value })}
                   />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-emerald-200 text-sm font-medium flex items-center gap-2">
+                    <Camera size={16} />
+                    {t('history.source')}
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 bg-emerald-900/60 border border-emerald-500/40 rounded-2xl text-emerald-100 focus:outline-none focus:ring-3 focus:ring-emerald-400/50 focus:border-emerald-400 transition-all duration-300"
+                    value={filter.source}
+                    onChange={(e) => setFilter({ ...filter, source: e.target.value })}
+                  >
+                    <option value="">{t('history.allSources')}</option>
+                    <option value="upload">{t('history.uploaded')}</option>
+                    <option value="live">{t('history.live')}</option>
+                  </select>
                 </div>
               </div>
             </CardContent>
@@ -212,8 +276,8 @@ export default function HistoryPage() {
               variants={itemVariants}
             >
               <History className="h-20 w-20 mx-auto text-emerald-400/30 mb-6" />
-              <p className="text-emerald-200 text-lg">No classifications found</p>
-              <p className="text-emerald-300 text-sm mt-2">Start by analyzing your first image</p>
+              <p className="text-emerald-200 text-lg">{t('history.noClassifications')}</p>
+              <p className="text-emerald-300 text-sm mt-2">{t('history.startAnalyzing')}</p>
             </motion.div>
           ) : (
             <AnimatePresence>
@@ -233,12 +297,25 @@ export default function HistoryPage() {
                         <div>
                           <CardTitle className="capitalize text-emerald-100 text-xl flex items-center gap-2">
                             <Leaf className="h-5 w-5" />
-                            {classification.animalType}
+                            {translateResult(classification.animalType)}
                           </CardTitle>
                           <CardDescription className="text-emerald-200 flex items-center gap-2 mt-2">
                             <Calendar className="h-4 w-4" />
                             {formatDate(classification.createdAt)}
                           </CardDescription>
+                          <div className="flex items-center gap-2 mt-2">
+                            {classification.source === 'live' ? (
+                              <div className="flex items-center gap-1 bg-teal-900/40 px-2 py-1 rounded-lg border border-teal-500/30">
+                                <Camera className="h-3 w-3 text-teal-300" />
+                                <span className="text-teal-200 text-xs">{t('history.live')}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1 bg-emerald-900/40 px-2 py-1 rounded-lg border border-emerald-500/30">
+                                <Upload className="h-3 w-3 text-emerald-300" />
+                                <span className="text-emerald-200 text-xs">{t('history.uploaded')}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div className="flex gap-2">
                           <Button
@@ -266,7 +343,7 @@ export default function HistoryPage() {
                       <div className="aspect-video bg-emerald-900/40 rounded-2xl overflow-hidden border border-emerald-500/20 group-hover:border-emerald-400/40 transition-all duration-300">
                         <img
                           src={classification.imageUrl}
-                          alt={`${classification.animalType} classification`}
+                          alt={`${translateResult(classification.animalType)} classification`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
@@ -278,7 +355,7 @@ export default function HistoryPage() {
                             <div className="text-2xl font-bold text-emerald-300 mb-1">
                               {classification.overallScore}
                             </div>
-                            <div className="text-emerald-200 text-sm">Overall Score</div>
+                            <div className="text-emerald-200 text-sm">{t('analysis.overallScore')}</div>
                           </div>
                         </div>
                         <div className="bg-teal-900/40 p-4 rounded-2xl border border-teal-500/20">
@@ -286,7 +363,7 @@ export default function HistoryPage() {
                             <div className="text-2xl font-bold text-teal-300 mb-1">
                               {(classification.confidence * 100).toFixed(1)}%
                             </div>
-                            <div className="text-teal-200 text-sm">Confidence</div>
+                            <div className="text-teal-200 text-sm">{t('history.confidence')}</div>
                           </div>
                         </div>
                       </div>
@@ -295,20 +372,20 @@ export default function HistoryPage() {
                       <div className="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/50">
                         <h4 className="text-emerald-200 font-semibold mb-3 flex items-center gap-2">
                           <BarChart3 size={18} />
-                          Measurements
+                          {t('analysis.measurements')}
                         </h4>
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div className="text-emerald-100">
-                            <span className="text-emerald-300">Body Length:</span> {classification.bodyLength} cm
+                            <span className="text-emerald-300">{t('analysis.bodyLength')}:</span> {classification.bodyLength} {t('analysis.cm')}
                           </div>
                           <div className="text-emerald-100">
-                            <span className="text-emerald-300">Height:</span> {classification.heightAtWithers} cm
+                            <span className="text-emerald-300">{t('analysis.height')}:</span> {classification.heightAtWithers} {t('analysis.cm')}
                           </div>
                           <div className="text-emerald-100">
-                            <span className="text-emerald-300">Chest Width:</span> {classification.chestWidth} cm
+                            <span className="text-emerald-300">{t('analysis.chestWidth')}:</span> {classification.chestWidth} {t('analysis.cm')}
                           </div>
                           <div className="text-emerald-100">
-                            <span className="text-emerald-300">Body Condition:</span> {classification.bodyCondition}/9
+                            <span className="text-emerald-300">{t('history.bodyCondition')}:</span> {classification.bodyCondition}/9
                           </div>
                         </div>
                       </div>
@@ -318,11 +395,11 @@ export default function HistoryPage() {
                         <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-500/20">
                           <h4 className="text-emerald-200 font-semibold mb-2 flex items-center gap-2">
                             <MapPin size={16} />
-                            Farm Information
+                            {t('history.farmInfo')}
                           </h4>
                           <div className="text-emerald-100 text-sm space-y-1">
-                            <div>Farm: {classification.farmName}</div>
-                            {classification.location && <div>Location: {classification.location}</div>}
+                            <div>{t('upload.farmName')}: {classification.farmName}</div>
+                            {classification.location && <div>{t('upload.location')}: {classification.location}</div>}
                           </div>
                         </div>
                       )}
@@ -330,12 +407,22 @@ export default function HistoryPage() {
                       {/* Enhanced Additional Info */}
                       {(classification.breed || classification.age || classification.gender) && (
                         <div className="bg-teal-900/40 p-4 rounded-2xl border border-teal-500/20">
-                          <h4 className="text-teal-200 font-semibold mb-2">Additional Details</h4>
+                          <h4 className="text-teal-200 font-semibold mb-2">{t('history.additionalDetails')}</h4>
                           <div className="text-teal-100 text-sm space-y-1">
-                            {classification.breed && <div>Breed: {classification.breed}</div>}
-                            {classification.age && <div>Age: {classification.age} years</div>}
-                            {classification.gender && <div>Gender: {classification.gender}</div>}
+                            {classification.breed && <div>{t('history.breed')}: {classification.breed}</div>}
+                            {classification.age && <div>{t('history.age')}: {classification.age} {t('history.years')}</div>}
+                            {classification.gender && <div>{t('history.gender')}: {classification.gender}</div>}
                           </div>
+                        </div>
+                      )}
+
+                      {/* Analysis Notes */}
+                      {classification.analysisNotes && (
+                        <div className="bg-white/10 p-4 rounded-2xl border border-emerald-500/20">
+                          <h4 className="text-emerald-200 font-semibold mb-2">{t('analysis.analysisNotes')}</h4>
+                          <p className="text-emerald-100 text-sm leading-relaxed">
+                            {translateAnalysisNotes(classification.analysisNotes, t)}
+                          </p>
                         </div>
                       )}
                     </CardContent>
@@ -345,7 +432,8 @@ export default function HistoryPage() {
             </AnimatePresence>
           )}
         </motion.div>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

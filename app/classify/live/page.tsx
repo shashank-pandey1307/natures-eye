@@ -7,10 +7,28 @@ import { Camera, ArrowLeft, Play, Square, RotateCcw, AlertTriangle, User, Zap, C
 import { motion, AnimatePresence } from 'framer-motion';
 import { BackgroundParticles, FloatingOrbs, EnergyWaves, FloatingClouds, FlyingBirds, Butterflies, SunRays, FloatingFlowers, FloatingLeaves, RainDrops, Fireflies, FloatingBubbles, EnhancedClouds, FloatingFeathers, FloatingSeeds } from '@/components/ui/particles';
 import { ProtectedRoute } from '@/components/protected-route';
+import { useLanguage } from '@/lib/language-context';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
 
 export default function LiveCameraPage() {
+  const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [isStreaming, setIsStreaming] = useState(false);
+  
+  // Helper function to translate classification results
+  const translateResult = (result: string) => {
+    switch (result.toLowerCase()) {
+      case 'cattle':
+        return t('results.cattle');
+      case 'buffalo':
+        return t('results.buffalo');
+      case 'human':
+        return t('results.human');
+      default:
+        return t('results.unknown');
+    }
+  };
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [currentResult, setCurrentResult] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -227,10 +245,14 @@ export default function LiveCameraPage() {
       const formData = new FormData();
       formData.append('image', blob, 'captured.jpg');
       formData.append('mode', 'live'); // Indicate this is live mode
+      formData.append('source', 'live'); // Track source as live
       
       // Send to API for analysis
       const apiResponse = await fetch('/api/classify', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       });
       
@@ -649,7 +671,7 @@ export default function LiveCameraPage() {
           <Link href="/classify">
             <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Options
+              {t('live.backToOptions')}
             </Button>
           </Link>
         </motion.div>
@@ -669,11 +691,11 @@ export default function LiveCameraPage() {
           </motion.div>
           
           <h1 className="text-5xl font-bold text-emerald-800 mb-4 gentle-bounce">
-            Live Camera Feed
+            {t('live.title')}
           </h1>
           
           <p className="text-xl text-white max-w-2xl mx-auto leading-relaxed">
-            Real-time livestock classification between cattle and buffaloes
+            {t('live.subtitle')}
           </p>
         </motion.div>
 
@@ -705,7 +727,7 @@ export default function LiveCameraPage() {
                         className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-2xl shadow-lg hover:shadow-emerald-500/30 transition-all duration-300"
                       >
                         <Play className="w-5 h-5 mr-2" />
-                        Start Camera
+                        {t('live.startCamera')}
                       </Button>
                                          ) : (
                        <>
@@ -716,13 +738,13 @@ export default function LiveCameraPage() {
                              transition={{ duration: 1, repeat: Infinity }}
                            />
                                                        <span className="text-green-700 font-medium">
-                              Auto-capturing every 3 seconds
+                              {t('live.autoCapturing')}
                             </span>
                          </div>
                          <div className="flex items-center gap-2 text-sm text-teal-600">
-                           <span>Status:</span>
+                           <span>{t('live.status')}:</span>
                            <span className="font-medium">
-                             {isAnalyzing ? 'Analyzing...' : 'Ready for next capture'}
+                             {isAnalyzing ? t('live.analyzing') : t('live.readyForCapture')}
                            </span>
                          </div>
                          <Button
@@ -731,7 +753,7 @@ export default function LiveCameraPage() {
                            className="px-8 py-3 border-2 border-red-400 text-red-600 hover:bg-red-50 font-semibold rounded-2xl transition-all duration-300"
                          >
                            <Square className="w-5 h-5 mr-2" />
-                           Stop Camera
+                           {t('live.stopCamera')}
                          </Button>
                        </>
                      )}
@@ -747,20 +769,20 @@ export default function LiveCameraPage() {
                              animate={{ scale: [1, 1.2, 1] }}
                              transition={{ duration: 1, repeat: Infinity }}
                            />
-                           <span className="text-blue-700 font-medium">Live Detection Active</span>
+                           <span className="text-blue-700 font-medium">{t('live.liveDetectionActive')}</span>
                          </div>
                          {currentResult ? (
                            <div className="flex items-center gap-2">
                              <span className="text-blue-600">•</span>
                              <span className="text-blue-700">
-                               Detected: <span className="font-semibold">{currentResult}</span>
+                               {t('live.detected')}: <span className="font-semibold">{translateResult(currentResult)}</span>
                              </span>
                            </div>
                          ) : (
                            <div className="flex items-center gap-2">
                              <span className="text-blue-600">•</span>
                              <span className="text-blue-700">
-                               Status: <span className="font-semibold">Scanning for livestock...</span>
+                               {t('live.status')}: <span className="font-semibold">{t('live.scanning')}</span>
                              </span>
                            </div>
                          )}
@@ -774,8 +796,8 @@ export default function LiveCameraPage() {
                       <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-400">
                         <div className="text-center text-gray-500">
                           <Camera className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                          <p className="text-lg font-medium">Camera not active</p>
-                          <p className="text-sm">Click start to begin live feed</p>
+                          <p className="text-lg font-medium">{t('live.cameraNotActive')}</p>
+                          <p className="text-sm">{t('live.clickToStart')}</p>
                         </div>
                       </div>
                     ) : (
@@ -812,7 +834,7 @@ export default function LiveCameraPage() {
                                animate={{ scale: [1, 1.2, 1] }}
                                transition={{ duration: 1, repeat: Infinity }}
                              />
-                             Auto
+                             {t('live.auto')}
                            </div>
                          )}
                          
@@ -830,7 +852,7 @@ export default function LiveCameraPage() {
                              {/* Result Label - Displayed on the object's face */}
                              <div className="absolute inset-0 flex items-center justify-center">
                                <div className="bg-red-500/90 text-white px-2 py-1 rounded text-xs font-medium text-center">
-                                 {currentResult}
+                                 {translateResult(currentResult)}
                                  <br />
                                  <span className="text-xs opacity-90">
                                    {(confidence * 100).toFixed(0)}%
@@ -860,13 +882,13 @@ export default function LiveCameraPage() {
 
                                      {/* Instructions */}
                    <div className="bg-white/50 p-4 rounded-xl border border-teal-200/40">
-                     <h4 className="text-teal-700 font-semibold mb-2">How it works</h4>
+                     <h4 className="text-teal-700 font-semibold mb-2">{t('live.howItWorks')}</h4>
                      <ul className="text-teal-700 text-sm space-y-1">
-                       <li>• Start the camera to begin live feed</li>
-                       <li>• Position livestock in view</li>
-                                               <li>• Automatic capture every 3 seconds</li>
-                       <li>• Red bounding box shows detected animals</li>
-                       <li>• Real-time classification with confidence scores</li>
+                       <li>• {t('live.step1')}</li>
+                       <li>• {t('live.step2')}</li>
+                       <li>• {t('live.step3')}</li>
+                       <li>• {t('live.step4')}</li>
+                       <li>• {t('live.step5')}</li>
                      </ul>
                    </div>
 
@@ -894,7 +916,7 @@ export default function LiveCameraPage() {
                                size="sm"
                                className="bg-red-600 hover:bg-red-700 text-white"
                              >
-                               Retry Camera
+                               {t('live.retryCamera')}
                              </Button>
                            )}
                          </div>

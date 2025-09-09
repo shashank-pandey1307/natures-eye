@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Lock, Eye, EyeOff, UserPlus, CheckCircle, LogIn } from 'lucide-react';
+import { ArrowLeft, User, Lock, Eye, EyeOff, UserPlus, CheckCircle, LogIn, Globe } from 'lucide-react';
 import { BackgroundParticles, FloatingOrbs, EnergyWaves, FloatingClouds, FlyingBirds, Butterflies, SunRays, FloatingFlowers, FloatingLeaves, RainDrops, Fireflies, FloatingBubbles, EnhancedClouds, FloatingFeathers, FloatingSeeds } from '@/components/ui/particles';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/language-context';
 
 export default function SignUpPage() {
+  const { t, language, setLanguage } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -188,6 +190,26 @@ export default function SignUpPage() {
       <FloatingSeeds />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
+        {/* Language Switcher */}
+        <motion.div 
+          className="flex justify-end mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-2">
+            <Globe className="h-4 w-4 text-white" />
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as 'en' | 'hi')}
+              className="bg-transparent border-none text-white text-sm focus:outline-none cursor-pointer"
+            >
+              <option value="en" className="bg-emerald-900 text-white">English</option>
+              <option value="hi" className="bg-emerald-900 text-white">हिंदी</option>
+            </select>
+          </div>
+        </motion.div>
+
         {/* Back Button */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -198,37 +220,37 @@ export default function SignUpPage() {
           <Link href="/">
             <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Welcome
+              {t('signup.backToWelcome')}
             </Button>
           </Link>
         </motion.div>
 
         <motion.div 
-          className="max-w-md mx-auto"
+          className="max-w-md mx-auto px-4"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           <motion.div variants={itemVariants}>
             <Card className="bg-gradient-to-br from-white/90 via-cyan-100/85 to-emerald-100/90 backdrop-blur-xl border-teal-300/70 shadow-2xl shadow-teal-400/30">
-              <CardHeader className="text-center pb-6">
+              <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
                 <motion.div
-                  className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl mb-4 shadow-lg"
+                  className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 shadow-lg"
                   whileHover={{ scale: 1.05, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 >
-                  <UserPlus className="w-8 h-8 text-white" />
+                  <UserPlus className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </motion.div>
-                <CardTitle className="text-3xl font-bold text-teal-800 mb-2">
-                  Create Account
+                <CardTitle className="text-2xl sm:text-3xl font-bold text-teal-800 mb-2">
+                  {t('signup.title')}
                 </CardTitle>
-                <CardDescription className="text-teal-600 text-lg">
-                  Join Nature's Eye today
+                <CardDescription className="text-teal-600 text-base sm:text-lg">
+                  {t('signup.subtitle')}
                 </CardDescription>
               </CardHeader>
               
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+              <CardContent className="px-4 sm:px-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                   {/* Name Field */}
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-medium text-teal-700">

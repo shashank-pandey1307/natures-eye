@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -15,6 +15,7 @@ model User {
   createdAt         DateTime               @default(now())
   updatedAt         DateTime               @updatedAt
   classifications   AnimalClassification[]
+  history           UserHistory[]
 
   @@map("users")
 }
@@ -43,11 +44,43 @@ model AnimalClassification {
   updatedAt         DateTime @updatedAt
   analysisNotes     String?
   confidence        Float?
-  userId            String?
+  userId            String
+  source            String   @default("upload") // "upload" or "live"
   farm              Farm?    @relation(fields: [farmId], references: [id])
-  user              User?    @relation(fields: [userId], references: [id])
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("animal_classifications")
+}
+
+model UserHistory {
+  id                String   @id @default(cuid())
+  userId            String
+  animalType        String
+  imageUrl          String
+  imagePath         String
+  bodyLength        Float?
+  heightAtWithers   Float?
+  chestWidth        Float?
+  rumpAngle         Float?
+  bodyCondition     Float?
+  overallScore      Float
+  breedScore        Float?
+  conformationScore Float?
+  breed             String?
+  age               Int?
+  weight            Float?
+  gender            String?
+  farmId            String?
+  farmName          String?
+  location          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  analysisNotes     String?
+  confidence        Float?
+  source            String   @default("upload") // "upload" or "live"
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_history")
 }
 
 model Farm {

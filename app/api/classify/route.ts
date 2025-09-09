@@ -2,14 +2,57 @@ import { NextRequest, NextResponse } from 'next/server';
 import { analyzeAnimalImage } from '@/lib/gemini';
 import { bufferToBase64, validateImageFile } from '@/lib/image-utils';
 import { prisma } from '@/lib/prisma';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Helper function to verify JWT token
+function verifyToken(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.substring(7);
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify user authentication
+    const decoded = verifyToken(request);
+    if (!decoded) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Please login first.' },
+        { status: 401 }
+      );
+    }
+
+    const { userId } = decoded;
+    
+    // Verify user exists in database
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found. Please login again.' },
+        { status: 401 }
+      );
+    }
+    
     const formData = await request.formData();
     const file = formData.get('image') as File;
     const farmId = formData.get('farmId') as string;
     const farmName = formData.get('farmName') as string;
     const location = formData.get('location') as string;
+    const source = formData.get('source') as string || 'upload'; // Track source: 'upload' or 'live'
 
     if (!file) {
       return NextResponse.json(
@@ -68,9 +111,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Save to database without image storage
+    // Save to database with user association and source tracking
     const classification = await prisma.animalClassification.create({
       data: {
+        user: {
+          connect: { id: userId } // Associate with logged-in user using connect
+        },
         animalType: analysis.animalType || 'Human',
         imageUrl: '', // No image URL since we don't store images
         imagePath: '', // No image path since we don't store images
@@ -86,11 +132,14 @@ export async function POST(request: NextRequest) {
         age: analysis.metadata?.age || undefined,
         weight: analysis.metadata?.weight || undefined,
         gender: analysis.metadata?.gender || 'Unknown',
-        farmId: finalFarmId,
+        farm: finalFarmId ? {
+          connect: { id: finalFarmId }
+        } : undefined, // Connect to farm if farmId exists
         farmName: farmName || null,
         location: location || null,
         confidence: analysis.confidence || 0.5,
         analysisNotes: analysis.analysisNotes || 'Analysis completed',
+        source: source, // Track whether this came from upload or live feed
       },
     });
 

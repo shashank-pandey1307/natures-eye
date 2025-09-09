@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { useLanguage } from '@/lib/language-context';
 
 interface LogoutPopupProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ interface LogoutPopupProps {
 }
 
 export function LogoutPopup({ isOpen, onClose, onConfirm }: LogoutPopupProps) {
+  const { t } = useLanguage();
+  
   return (
     <AnimatePresence>
       {isOpen && (
@@ -40,7 +43,7 @@ export function LogoutPopup({ isOpen, onClose, onConfirm }: LogoutPopupProps) {
                 transition={{ delay: 0.2 }}
                 className="text-2xl font-bold text-gray-900 mb-3"
               >
-                Logout Confirmation
+                {t('logout.title')}
               </motion.h3>
               
               {/* Popup Message */}
@@ -50,8 +53,8 @@ export function LogoutPopup({ isOpen, onClose, onConfirm }: LogoutPopupProps) {
                 transition={{ delay: 0.3 }}
                 className="text-gray-600 mb-8 text-lg leading-relaxed"
               >
-                Are you sure you want to logout?<br />
-                You'll need to sign in again to access your account.
+                {t('logout.message')}<br />
+                {t('logout.submessage')}
               </motion.p>
               
               {/* Popup Buttons */}
@@ -66,13 +69,13 @@ export function LogoutPopup({ isOpen, onClose, onConfirm }: LogoutPopupProps) {
                   variant="outline"
                   className="px-8 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 font-semibold rounded-xl transition-all duration-300"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={onConfirm}
                   className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-red-500/30 transition-all duration-300"
                 >
-                  Logout
+                  {t('logout.logout')}
                 </Button>
               </motion.div>
             </div>

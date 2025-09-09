@@ -7,10 +7,12 @@ import { motion } from 'framer-motion';
 import { Camera, Upload, ArrowLeft, Sparkles, Target } from 'lucide-react';
 import { BackgroundParticles, FloatingOrbs, EnergyWaves, FloatingClouds, FlyingBirds, Butterflies, SunRays, FloatingFlowers, FloatingLeaves, RainDrops, Fireflies, FloatingBubbles, EnhancedClouds, FloatingFeathers, FloatingSeeds } from '@/components/ui/particles';
 import { ProtectedRoute } from '@/components/protected-route';
+import { useLanguage } from '@/lib/language-context';
 import Link from 'next/link';
 
 export default function ClassifyPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -85,7 +87,7 @@ export default function ClassifyPage() {
           <Link href="/">
             <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Welcome
+              {t('classify.backToWelcome')}
             </Button>
           </Link>
         </motion.div>
@@ -100,14 +102,14 @@ export default function ClassifyPage() {
             className="text-5xl font-bold text-emerald-800 mb-4"
             variants={itemVariants}
           >
-            Choose Classification Method
+            {t('classify.title')}
           </motion.h1>
           
           <motion.p 
             className="text-xl text-white max-w-2xl mx-auto leading-relaxed"
             variants={itemVariants}
           >
-            Select how you'd like to analyze your livestock
+            {t('classify.subtitle')}
           </motion.p>
         </motion.div>
 
@@ -133,32 +135,31 @@ export default function ClassifyPage() {
                     <Upload className="w-12 h-12 text-white" />
                   </motion.div>
                   <CardTitle className="text-3xl font-bold text-teal-800 mb-2">
-                    Image Upload
+                    {t('classify.upload.title')}
                   </CardTitle>
                   <CardDescription className="text-teal-600 text-lg">
-                    Upload photos for comprehensive analysis
+                    {t('classify.upload.subtitle')}
                   </CardDescription>
                 </CardHeader>
                 
                 <CardContent className="space-y-6">
                   <div className="text-center space-y-4">
                     <div className="flex flex-wrap justify-center gap-2 text-sm text-teal-700">
-                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">Full Analysis</span>
-                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">Breed Detection</span>
-                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">Quality Scoring</span>
-                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">Measurements</span>
+                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">{t('classify.upload.features.fullAnalysis')}</span>
+                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">{t('classify.upload.features.breedDetection')}</span>
+                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">{t('classify.upload.features.qualityScoring')}</span>
+                      <span className="px-3 py-1 bg-teal-200/60 rounded-full">{t('classify.upload.features.measurements')}</span>
                     </div>
                     
                     <p className="text-teal-700 text-sm leading-relaxed">
-                      Get detailed analysis including breed identification, quality scores, 
-                      body measurements, and comprehensive livestock assessment.
+                      {t('classify.upload.description')}
                     </p>
                   </div>
                   
                   <div className="text-center pt-4">
                     <Button className="w-full px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold text-lg rounded-2xl shadow-lg hover:shadow-teal-500/30 transition-all duration-300">
                       <Upload className="w-5 h-5 mr-2" />
-                      Upload Image
+                      {t('classify.upload.button')}
                     </Button>
                   </div>
                 </CardContent>
@@ -182,32 +183,31 @@ export default function ClassifyPage() {
                     <Camera className="w-12 h-12 text-white" />
                   </motion.div>
                   <CardTitle className="text-3xl font-bold text-teal-800 mb-2">
-                    Live Camera Feed
+                    {t('classify.live.title')}
                   </CardTitle>
                   <CardDescription className="text-teal-600 text-lg">
-                    Real-time classification with camera
+                    {t('classify.live.subtitle')}
                   </CardDescription>
                 </CardHeader>
                 
                 <CardContent className="space-y-6">
                   <div className="text-center space-y-4">
                     <div className="flex flex-wrap justify-center gap-2 text-sm text-teal-700">
-                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">Real-time</span>
-                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">Cattle/Buffalo</span>
-                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">Human Detection</span>
-                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">Instant Results</span>
+                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">{t('classify.live.features.realtime')}</span>
+                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">{t('classify.live.features.cattleBuffalo')}</span>
+                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">{t('classify.live.features.humanDetection')}</span>
+                      <span className="px-3 py-1 bg-cyan-200/60 rounded-full">{t('classify.live.features.instantResults')}</span>
                     </div>
                     
                     <p className="text-teal-700 text-sm leading-relaxed">
-                      Get instant classification between cattle and buffaloes. 
-                      Also detects humans for safety. Perfect for live monitoring.
+                      {t('classify.live.description')}
                     </p>
                   </div>
                   
                   <div className="text-center pt-4">
                     <Button className="w-full px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700 text-white font-semibold text-lg rounded-2xl shadow-lg hover:shadow-cyan-500/30 transition-all duration-300">
                       <Camera className="w-5 h-5 mr-2" />
-                      Start Camera
+                      {t('classify.live.button')}
                     </Button>
                   </div>
                 </CardContent>
@@ -226,12 +226,11 @@ export default function ClassifyPage() {
           <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Sparkles className="w-6 h-6 text-emerald-200" />
-              <h3 className="text-xl font-semibold text-white">AI-Powered Analysis</h3>
+              <h3 className="text-xl font-semibold text-white">{t('classify.aiPowered')}</h3>
               <Sparkles className="w-6 h-6 text-emerald-200" />
             </div>
             <p className="text-emerald-100 text-sm leading-relaxed max-w-2xl mx-auto">
-              Our advanced AI system provides accurate livestock classification with high confidence levels. 
-              Choose the method that best fits your needs and get instant, reliable results.
+              {t('classify.aiDescription')}
             </p>
           </div>
         </motion.div>

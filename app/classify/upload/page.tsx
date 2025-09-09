@@ -7,9 +7,29 @@ import { Upload, Target, ArrowLeft, Leaf } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BackgroundParticles, FloatingOrbs, EnergyWaves, FloatingClouds, FlyingBirds, Butterflies, SunRays, FloatingFlowers, FloatingLeaves, RainDrops, Fireflies, FloatingBubbles, EnhancedClouds, FloatingFeathers, FloatingSeeds } from '@/components/ui/particles';
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/language-context';
+import { ProtectedRoute } from '@/components/protected-route';
+import { translateAnalysisNotes } from '@/lib/utils';
 
 export default function UploadPage() {
+  const { user, token } = useAuth();
+  const { t } = useLanguage();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  // Helper function to translate classification results
+  const translateResult = (result: string) => {
+    switch (result.toLowerCase()) {
+      case 'cattle':
+        return t('results.cattle');
+      case 'buffalo':
+        return t('results.buffalo');
+      case 'human':
+        return t('results.human');
+      default:
+        return t('results.unknown');
+    }
+  };
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [farmData, setFarmData] = useState({
@@ -65,9 +85,13 @@ export default function UploadPage() {
       formData.append('farmId', farmData.farmId);
       formData.append('farmName', farmData.farmName);
       formData.append('location', farmData.location);
+      formData.append('source', 'upload'); // Track source as upload
 
       const response = await fetch('/api/classify', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       });
 
@@ -127,7 +151,8 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-500 via-cyan-400 to-emerald-500">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-teal-500 via-cyan-400 to-emerald-500">
       {/* Animated Background Elements */}
       <BackgroundParticles />
       <FloatingOrbs />
@@ -156,7 +181,7 @@ export default function UploadPage() {
           <Link href="/classify">
             <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Options
+              {t('upload.backToOptions')}
             </Button>
           </Link>
         </motion.div>
@@ -176,11 +201,11 @@ export default function UploadPage() {
           </motion.div>
           
           <h1 className="text-5xl font-bold text-emerald-800 mb-4 gentle-bounce">
-            Image Classification
+            {t('upload.title')}
           </h1>
           
           <p className="text-xl text-white max-w-2xl mx-auto leading-relaxed">
-            Upload your livestock images for comprehensive AI-powered analysis
+            {t('upload.subtitle')}
           </p>
         </motion.div>
 
@@ -193,10 +218,10 @@ export default function UploadPage() {
           <Card className="bg-gradient-to-br from-white/90 via-cyan-100/85 to-emerald-100/90 backdrop-blur-xl border-teal-300/70 shadow-2xl shadow-teal-400/30 aurora">
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-3xl font-bold text-teal-800 mb-2">
-                Upload & Analyze
+                {t('upload.cardTitle')}
               </CardTitle>
               <CardDescription className="text-teal-600 text-lg">
-                Get instant AI-powered livestock classification
+                {t('upload.cardDescription')}
               </CardDescription>
             </CardHeader>
             
@@ -233,7 +258,7 @@ export default function UploadPage() {
                             className="w-full h-full object-cover rounded-xl"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl flex items-end justify-center pb-4">
-                            <span className="text-white text-sm font-medium">Click to change image</span>
+                            <span className="text-white text-sm font-medium">{t('upload.clickToChange')}</span>
                           </div>
                         </div>
                       ) : (
@@ -245,10 +270,10 @@ export default function UploadPage() {
                             <Upload className="w-10 h-10 text-white" />
                           </motion.div>
                           <p className="text-teal-700 text-lg font-medium mb-2">
-                            Drop your image here or click to browse
+                            {t('upload.dragDrop')}
                           </p>
                           <p className="text-teal-600 text-sm">
-                            Supports JPEG, PNG, WebP (Max 10MB)
+                            {t('upload.fileTypes')} ({t('upload.maxSize')})
                           </p>
                         </>
                       )}
@@ -266,34 +291,34 @@ export default function UploadPage() {
                 transition={{ delay: 0.1 }}
               >
                 <div className="space-y-2">
-                  <label className="text-teal-700 text-sm font-medium">Farm ID</label>
+                  <label className="text-teal-700 text-sm font-medium">{t('upload.farmId')}</label>
                   <input
                     type="text"
                     value={farmData.farmId}
                     onChange={(e) => handleFarmDataChange('farmId', e.target.value)}
-                    placeholder="Enter farm ID"
+                    placeholder={t('upload.farmIdPlaceholder')}
                     className="w-full px-4 py-3 bg-white/80 border border-teal-300/60 rounded-xl text-teal-800 placeholder-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-teal-700 text-sm font-medium">Farm Name</label>
+                  <label className="text-teal-700 text-sm font-medium">{t('upload.farmName')}</label>
                   <input
                     type="text"
                     value={farmData.farmName}
                     onChange={(e) => handleFarmDataChange('farmName', e.target.value)}
-                    placeholder="Enter farm name"
+                    placeholder={t('upload.farmNamePlaceholder')}
                     className="w-full px-4 py-3 bg-white/80 border border-teal-300/60 rounded-xl text-teal-800 placeholder-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-teal-700 text-sm font-medium">Location</label>
+                  <label className="text-teal-700 text-sm font-medium">{t('upload.location')}</label>
                   <input
                     type="text"
                     value={farmData.location}
                     onChange={(e) => handleFarmDataChange('location', e.target.value)}
-                    placeholder="Enter location"
+                    placeholder={t('upload.locationPlaceholder')}
                     className="w-full px-4 py-3 bg-white/80 border border-teal-300/60 rounded-xl text-teal-800 placeholder-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition-all duration-300"
                   />
                 </div>
@@ -327,12 +352,12 @@ export default function UploadPage() {
                           animate={{ rotate: 360 }}
                           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         />
-                        <span>Analyzing...</span>
+                        <span>{t('upload.analyzing')}</span>
                       </motion.div>
                     ) : (
                       <span className="flex items-center space-x-2">
                         <Target className="w-5 h-5" />
-                        <span>Analyze Image</span>
+                        <span>{t('upload.analyze')}</span>
                       </span>
                     )}
                   </Button>
@@ -373,33 +398,33 @@ export default function UploadPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
                         <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
-                          <h4 className="text-teal-700 font-semibold mb-2">Animal Details</h4>
+                          <h4 className="text-teal-700 font-semibold mb-2">{t('analysis.animalDetails')}</h4>
                           <div className="space-y-2 text-teal-800">
-                            <p><span className="text-teal-600">Type:</span> {result.classification.animalType}</p>
-                            <p><span className="text-teal-600">Breed:</span> {result.classification.breed || 'Unknown'}</p>
-                            <p><span className="text-teal-600">Gender:</span> {result.classification.gender || 'Unknown'}</p>
-                            <p><span className="text-teal-600">Age:</span> {result.classification.age || 'Unknown'} years</p>
+                            <p><span className="text-teal-600">{t('analysis.type')}:</span> {translateResult(result.classification.animalType)}</p>
+                            <p><span className="text-teal-600">{t('analysis.breed')}:</span> {result.classification.breed || t('results.unknown')}</p>
+                            <p><span className="text-teal-600">{t('analysis.gender')}:</span> {result.classification.gender || t('results.unknown')}</p>
+                            <p><span className="text-teal-600">{t('analysis.age')}:</span> {result.classification.age || t('results.unknown')} {t('analysis.years')}</p>
                           </div>
                         </div>
                         
                         <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
-                          <h4 className="text-teal-700 font-semibold mb-2">Measurements</h4>
+                          <h4 className="text-teal-700 font-semibold mb-2">{t('analysis.measurements')}</h4>
                           <div className="space-y-2 text-teal-800">
-                            <p><span className="text-teal-600">Body Length:</span> {result.classification.bodyLength} cm</p>
-                            <p><span className="text-cyan-600">Height:</span> {result.classification.heightAtWithers} cm</p>
-                            <p><span className="text-cyan-600">Chest Width:</span> {result.classification.chestWidth} cm</p>
-                            <p><span className="text-cyan-600">Rump Angle:</span> {result.classification.rumpAngle}°</p>
+                            <p><span className="text-teal-600">{t('analysis.bodyLength')}:</span> {result.classification.bodyLength} {t('analysis.cm')}</p>
+                            <p><span className="text-cyan-600">{t('analysis.height')}:</span> {result.classification.heightAtWithers} {t('analysis.cm')}</p>
+                            <p><span className="text-cyan-600">{t('analysis.chestWidth')}:</span> {result.classification.chestWidth} {t('analysis.cm')}</p>
+                            <p><span className="text-cyan-600">{t('analysis.rumpAngle')}:</span> {result.classification.rumpAngle}{t('analysis.degrees')}</p>
                           </div>
                         </div>
                       </div>
                       
                       <div className="space-y-4">
                         <div className="bg-white/70 p-4 rounded-xl border border-teal-200/60">
-                          <h4 className="text-teal-700 font-semibold mb-2">Quality Scores</h4>
+                          <h4 className="text-teal-700 font-semibold mb-2">{t('history.qualityScores')}</h4>
                           <div className="space-y-3">
                             <div>
                               <div className="flex justify-between text-teal-800 mb-1">
-                                <span>Overall Score</span>
+                                <span>{t('analysis.overallScore')}</span>
                                 <span className="font-semibold">{result.classification.overallScore}/100</span>
                               </div>
                               <div className="w-full bg-teal-200/60 rounded-full h-2">
@@ -414,7 +439,7 @@ export default function UploadPage() {
                             
                             <div>
                               <div className="flex justify-between text-teal-800 mb-1">
-                                <span>Breed Score</span>
+                                <span>{t('analysis.breedScore')}</span>
                                 <span className="font-semibold">{result.classification.breedScore}/100</span>
                               </div>
                               <div className="w-full bg-teal-200/60 rounded-full h-2">
@@ -429,7 +454,7 @@ export default function UploadPage() {
                             
                             <div>
                               <div className="flex justify-between text-teal-800 mb-1">
-                                <span>Conformation</span>
+                                <span>{t('analysis.conformationScore')}</span>
                                 <span className="font-semibold">{result.classification.conformationScore}/100</span>
                               </div>
                               <div className="w-full bg-teal-200/60 rounded-full h-2">
@@ -455,7 +480,7 @@ export default function UploadPage() {
                             >
                               {(result.classification.confidence * 100).toFixed(1)}%
                             </motion.div>
-                            <p className="text-teal-700 text-sm">AI Confidence Level</p>
+                            <p className="text-teal-700 text-sm">{t('analysis.confidenceLevel')}</p>
                           </div>
                         </div>
                       </div>
@@ -463,9 +488,9 @@ export default function UploadPage() {
                     
                     {result.classification.analysisNotes && (
                       <div className="mt-6 bg-white/70 p-4 rounded-xl border border-teal-200/60">
-                        <h4 className="text-teal-700 font-semibold mb-2">Analysis Notes</h4>
+                        <h4 className="text-teal-700 font-semibold mb-2">{t('analysis.analysisNotes')}</h4>
                         <p className="text-teal-800 text-sm leading-relaxed">
-                          {result.classification.analysisNotes}
+                          {translateAnalysisNotes(result.classification.analysisNotes, t)}
                         </p>
                       </div>
                     )}
@@ -479,6 +504,7 @@ export default function UploadPage() {
       
       {/* Empty container for scrolling space */}
       <div className="h-32"></div>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }
