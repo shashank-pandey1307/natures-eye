@@ -51,7 +51,6 @@ export function Skeleton({
     >
       <motion.div
         className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-        style={style}
         animate={{
           backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
         }}

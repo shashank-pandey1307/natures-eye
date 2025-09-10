@@ -503,7 +503,7 @@ export default function UploadPage() {
                       <div className="mt-6 bg-white/70 p-4 rounded-xl border border-teal-200/60">
                         <h4 className="text-teal-700 font-semibold mb-2">{t('analysis.analysisNotes')}</h4>
                         <p className="text-teal-800 text-sm leading-relaxed">
-                          {translateAnalysisNotes(result.classification.analysisNotes, t)}
+                          {translateAnalysisNotes(result.classification.analysisNotes, t as any)}
                         </p>
                       </div>
                     )}

@@ -317,11 +317,11 @@ export const staggerContainer: Variants = {
 
 // Quick transitions for common use cases
 export const quickTransitions = {
-  fast: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] },
-  normal: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
-  slow: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
-  spring: { type: 'spring', stiffness: 300, damping: 30 },
-  bounce: { type: 'spring', stiffness: 400, damping: 10 },
+  fast: { duration: 0.2 },
+  normal: { duration: 0.4 },
+  slow: { duration: 0.6 },
+  spring: { type: 'spring' as const, stiffness: 300, damping: 30 },
+  bounce: { type: 'spring' as const, stiffness: 400, damping: 10 },
 };
 
 // Custom easing functions
