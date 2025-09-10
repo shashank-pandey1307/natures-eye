@@ -126,7 +126,7 @@ export default function LoginPage() {
           <Link href="/">
             <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('login.backToWelcome')}
+              Back
             </Button>
           </Link>
         </motion.div>

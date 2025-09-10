@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { History, Eye, Trash2, Filter, Leaf, BarChart3, MapPin, Calendar, User, Camera, Upload } from 'lucide-react';
+import { History, Eye, Trash2, Filter, Leaf, BarChart3, MapPin, Calendar, User, Camera, Upload, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
 import { useLanguage } from '@/lib/language-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { translateAnalysisNotes } from '@/lib/utils';
+import { ClassificationSkeleton, FilterSkeleton, SkeletonCard } from '@/components/ui/skeleton';
+import { containerVariants, itemVariants, fadeInVariants, quickTransitions } from '@/lib/transitions';
 
 interface Classification {
   id: string;
@@ -54,6 +56,8 @@ export default function HistoryPage() {
     }
   };
   const [loading, setLoading] = useState(true);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [filter, setFilter] = useState({
     animalType: '',
     farmId: '',
@@ -118,6 +122,35 @@ export default function HistoryPage() {
     }
   };
 
+  const handleClearAll = async () => {
+    setClearing(true);
+    try {
+      const response = await fetch('/api/classifications/clear', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setClassifications([]);
+        setShowClearConfirm(false);
+        alert(`Successfully cleared ${data.deletedCount} classifications`);
+      } else {
+        // Handle error without redirecting
+        console.error('Clear history error:', data.error);
+        alert(`Error: ${data.error || 'Failed to clear history'}`);
+      }
+    } catch (error) {
+      console.error('Error clearing classifications:', error);
+      alert('Failed to clear history. Please try again.');
+    } finally {
+      setClearing(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -128,45 +161,35 @@ export default function HistoryPage() {
     });
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut" as const
-      }
-    }
-  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-2xl mb-6 shadow-lg"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900">
+          <div className="container mx-auto px-4 py-12">
+            {/* Header Skeleton */}
+            <motion.div 
+              className="text-center mb-12"
+              variants={fadeInVariants}
+              initial="hidden"
+              animate="visible"
             >
-              <Leaf className="h-8 w-8 text-white" />
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-400 rounded-3xl mb-6 shadow-2xl shadow-emerald-500/30">
+                <History className="h-10 w-10 text-white" />
+              </div>
+              <div className="h-12 bg-gradient-to-r from-emerald-300/20 to-cyan-400/20 rounded-lg mb-4 max-w-md mx-auto"></div>
+              <div className="h-6 bg-gradient-to-r from-emerald-200/20 to-emerald-100/20 rounded-lg max-w-2xl mx-auto mb-4"></div>
+              <div className="h-8 bg-gradient-to-r from-emerald-300/20 to-emerald-200/20 rounded-lg max-w-xs mx-auto"></div>
             </motion.div>
-            <p className="text-emerald-100 text-lg">Loading classifications...</p>
+
+            {/* Filter Skeleton */}
+            <FilterSkeleton />
+
+            {/* Classifications Skeleton */}
+            <ClassificationSkeleton />
           </div>
         </div>
-      </div>
+      </ProtectedRoute>
     );
   }
 
@@ -197,9 +220,28 @@ export default function HistoryPage() {
           </p>
           
           {user && (
-            <div className="inline-flex items-center gap-2 bg-emerald-900/40 px-4 py-2 rounded-2xl border border-emerald-500/30">
-              <User className="h-4 w-4 text-emerald-300" />
-              <span className="text-emerald-200 text-sm">Welcome, {user.name}</span>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="inline-flex items-center gap-2 bg-emerald-900/40 px-4 py-2 rounded-2xl border border-emerald-500/30">
+                <User className="h-4 w-4 text-emerald-300" />
+                <span className="text-emerald-200 text-sm">Welcome, {user.name}</span>
+              </div>
+              
+              {classifications.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Button
+                    onClick={() => setShowClearConfirm(true)}
+                    variant="outline"
+                    className="border-red-500/40 text-red-200 hover:bg-red-500/20 hover:border-red-400 hover:text-red-100 transition-all duration-300"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Clear All History
+                  </Button>
+                </motion.div>
+              )}
             </div>
           )}
         </motion.div>
@@ -421,7 +463,7 @@ export default function HistoryPage() {
                         <div className="bg-white/10 p-4 rounded-2xl border border-emerald-500/20">
                           <h4 className="text-emerald-200 font-semibold mb-2">{t('analysis.analysisNotes')}</h4>
                           <p className="text-emerald-100 text-sm leading-relaxed">
-                            {translateAnalysisNotes(classification.analysisNotes, t)}
+                            {translateAnalysisNotes(classification.analysisNotes, t as any)}
                           </p>
                         </div>
                       )}
@@ -434,6 +476,76 @@ export default function HistoryPage() {
         </motion.div>
         </div>
       </div>
+
+      {/* Clear History Confirmation Dialog */}
+      <AnimatePresence>
+        {showClearConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowClearConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gradient-to-br from-slate-800/95 via-emerald-900/90 to-slate-800/95 backdrop-blur-xl border border-red-500/30 rounded-3xl p-8 max-w-md w-full shadow-2xl shadow-red-500/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
+                  className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mx-auto mb-6 flex items-center justify-center"
+                >
+                  <AlertTriangle className="h-8 w-8 text-white" />
+                </motion.div>
+                
+                <h3 className="text-2xl font-bold text-red-200 mb-4">
+                  Clear All History?
+                </h3>
+                
+                <p className="text-emerald-200 mb-6 leading-relaxed">
+                  This action will permanently delete all {classifications.length} classification records. 
+                  This cannot be undone.
+                </p>
+                
+                <div className="flex gap-4 justify-center">
+                  <Button
+                    onClick={() => setShowClearConfirm(false)}
+                    variant="outline"
+                    className="border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/20 hover:border-emerald-400"
+                    disabled={clearing}
+                  >
+                    Cancel
+                  </Button>
+                  
+                  <Button
+                    onClick={handleClearAll}
+                    disabled={clearing}
+                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0"
+                  >
+                    {clearing ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Clearing...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Trash2 className="h-4 w-4" />
+                        Clear All
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </ProtectedRoute>
   );
 }

@@ -177,7 +177,7 @@ export default function ClassifyPage() {
                 <CardHeader className="text-center pb-6">
                   <motion.div
                     className="w-24 h-24 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-3xl mx-auto mb-6 flex items-center justify-center"
-                    whileHover={{ scale: 1.1, rotate: -5 }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     <Camera className="w-12 h-12 text-white" />

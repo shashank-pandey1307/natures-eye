@@ -17,7 +17,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check for stored language preference
     const storedLanguage = localStorage.getItem('language') as Language;
-    if (storedLanguage && (storedLanguage === 'en' || storedLanguage === 'hi')) {
+    if (storedLanguage && (storedLanguage === 'en' || storedLanguage === 'hi' || storedLanguage === 'bn')) {
       setLanguage(storedLanguage);
     }
   }, []);

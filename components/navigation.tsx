@@ -4,15 +4,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Home, History, Leaf, Camera, Upload, LogOut, User, Globe, Menu, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
 import { useLanguage } from '@/lib/language-context';
 import { useState } from 'react';
 import { LogoutPopup } from './logout-popup';
+import { buttonVariants, iconVariants, slideInVariants, fadeInVariants, quickTransitions } from '@/lib/transitions';
 
 export function Navigation() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,7 +30,9 @@ export function Navigation() {
           <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
             <motion.div
               className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg"
-              whileHover={{ rotate: 8 }}
+              variants={iconVariants}
+              whileHover="hover"
+              transition={quickTransitions.spring}
             >
               <Leaf className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </motion.div>
@@ -44,7 +47,12 @@ export function Navigation() {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-4">
-            {user ? (
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full animate-spin"></div>
+                <span className="text-emerald-200 text-sm">Loading...</span>
+              </div>
+            ) : user ? (
               <>
                 <Link href="/classify">
                   <motion.div
@@ -88,11 +96,12 @@ export function Navigation() {
                   <Globe className="h-4 w-4 text-emerald-300" />
                   <select
                     value={language}
-                    onChange={(e) => setLanguage(e.target.value as 'en' | 'hi')}
+                    onChange={(e) => setLanguage(e.target.value as 'en' | 'hi' | 'bn')}
                     className="bg-emerald-900/60 border border-emerald-500/40 rounded-lg px-2 py-1 text-emerald-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/50"
                   >
                     <option value="en">English</option>
                     <option value="hi">हिंदी</option>
+                    <option value="bn">বাংলা</option>
                   </select>
                 </div>
                 
@@ -161,11 +170,12 @@ export function Navigation() {
                   <Globe className="h-4 w-4 text-emerald-300" />
                   <select
                     value={language}
-                    onChange={(e) => setLanguage(e.target.value as 'en' | 'hi')}
+                    onChange={(e) => setLanguage(e.target.value as 'en' | 'hi' | 'bn')}
                     className="bg-emerald-900/60 border border-emerald-500/40 rounded-lg px-2 py-1 text-emerald-100 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/50"
                   >
                     <option value="en">English</option>
                     <option value="hi">हिंदी</option>
+                    <option value="bn">বাংলা</option>
                   </select>
                 </div>
               </>
@@ -179,11 +189,12 @@ export function Navigation() {
               <Globe className="h-4 w-4 text-emerald-300" />
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value as 'en' | 'hi')}
+                onChange={(e) => setLanguage(e.target.value as 'en' | 'hi' | 'bn')}
                 className="bg-emerald-900/60 border border-emerald-500/40 rounded px-1 py-1 text-emerald-100 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
               >
                 <option value="en">EN</option>
                 <option value="hi">हि</option>
+                <option value="bn">বাং</option>
               </select>
             </div>
             
@@ -199,15 +210,21 @@ export function Navigation() {
         </div>
 
         {/* Mobile Navigation Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-emerald-500/30 bg-slate-900/95 backdrop-blur-xl"
-          >
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden border-t border-emerald-500/30 bg-slate-900/95 backdrop-blur-xl"
+            >
             <div className="px-4 py-4 space-y-3">
-              {user ? (
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2 py-4">
+                  <div className="w-4 h-4 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full animate-spin"></div>
+                  <span className="text-emerald-200 text-sm">Loading...</span>
+                </div>
+              ) : user ? (
                 <>
                   <Link href="/classify" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
@@ -285,8 +302,9 @@ export function Navigation() {
                 </>
               )}
             </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Logout Popup */}

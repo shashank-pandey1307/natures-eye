@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface User {
   id: string;
@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Check for stored auth data on mount
@@ -33,8 +34,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (storedToken && storedUser) {
       try {
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        // Verify token is still valid by checking if it's not expired
+        const tokenData = JSON.parse(atob(storedToken.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+        
+        if (tokenData.exp && tokenData.exp > currentTime) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+        } else {
+          // Token expired, clear stored data
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       } catch (error) {
         console.error('Error parsing stored user data:', error);
         // Clear invalid data
@@ -62,6 +73,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Redirect to login page after logout
     router.push('/login');
   };
+
+  // Clear user state when navigating to login page
+  useEffect(() => {
+    if (pathname === '/login') {
+      setUser(null);
+      setToken(null);
+    }
+  }, [pathname]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>

@@ -11,6 +11,8 @@ import { useAuth } from '@/lib/auth-context';
 import { useLanguage } from '@/lib/language-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { translateAnalysisNotes } from '@/lib/utils';
+import { Skeleton, SkeletonCard, SkeletonText, SkeletonButton } from '@/components/ui/skeleton';
+import { containerVariants, itemVariants, cardVariants, buttonVariants, iconVariants, quickTransitions } from '@/lib/transitions';
 
 export default function UploadPage() {
   const { user, token } = useAuth();
@@ -115,40 +117,6 @@ export default function UploadPage() {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut" as const
-      }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { scale: 0.9, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut" as const
-      }
-    }
-  };
 
   return (
     <ProtectedRoute>
@@ -175,14 +143,20 @@ export default function UploadPage() {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={quickTransitions.normal}
           className="mb-8"
         >
           <Link href="/classify">
-            <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('upload.backToOptions')}
-            </Button>
+            <motion.div
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <Button variant="ghost" className="text-white hover:text-emerald-200 hover:bg-white/10">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                {t('upload.backToOptions')}
+              </Button>
+            </motion.div>
           </Link>
         </motion.div>
 
@@ -194,8 +168,9 @@ export default function UploadPage() {
         >
           <motion.div
             className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-teal-500 via-cyan-500 to-emerald-500 rounded-3xl mb-6 shadow-2xl shadow-teal-500/40 sparkle breathe"
-            whileHover={{ scale: 1.08, rotate: 8 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            variants={iconVariants}
+            whileHover="hover"
+            transition={quickTransitions.spring}
           >
             <Leaf className="w-10 h-10 text-white" />
           </motion.div>
@@ -378,6 +353,44 @@ export default function UploadPage() {
                     }`}
                   >
                     {message}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Loading State */}
+              <AnimatePresence>
+                {isAnalyzing && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="mt-8 p-6 bg-gradient-to-br from-white/80 via-cyan-100/70 to-emerald-100/80 rounded-2xl border border-teal-300/50 shadow-lg"
+                  >
+                    <div className="text-center mb-6">
+                      <motion.div
+                        className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl mb-4"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Target className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <h3 className="text-2xl font-bold text-teal-800 mb-2">
+                        {t('upload.analyzing')}
+                      </h3>
+                      <p className="text-teal-600">
+                        {t('upload.analyzingDescription')}
+                      </p>
+                    </div>
+                    
+                    {/* Skeleton for results */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <SkeletonCard />
+                      </div>
+                      <div className="space-y-4">
+                        <SkeletonCard />
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
